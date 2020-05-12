@@ -13,11 +13,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
 //Rutas del controlador usuario
-Route::post('/api/register', 'UserController@register');
-Route::post('/api/login', 'UserController@login');
+Route::post('/api/user/register', 'UserController@register');
+Route::post('/api/user/login', 'UserController@login');
 Route::put('/api/user/update', 'UserController@update');
 //Aqui va algo
 Route::get('/api/user/avatar/{filename}', 'UserController@getImage');
 Route::get('/api/user/detail/{id}', 'UserController@detail');
+
+
+//Rutas del controlador Comercio
+Route::post('/api/commerce/register', 'CommerceController@register');
+Route::post('/api/commerce/login', 'CommerceController@login');
+Route::put('/api/commerce/update', 'CommerceController@update');
+//Aqui va algo
+Route::get('/api/commerce/avatar/{filename}', 'CommerceController@getImage');
+Route::get('/api/commerce/detail/{id}', 'CommerceController@detail');

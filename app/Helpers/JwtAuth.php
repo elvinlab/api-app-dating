@@ -11,10 +11,10 @@ class JwtAuth{
     public $key;
     
     public function __construct() {
-        $this->key = 'proyecto_app_dating_Decimoinc_user_commerce_login_50081706';
+        $this->key = 'Proyecto_app_dating_Decimoinc_user_commerce_team_Adrian_Elvin_Josesteban_2020';
     }
     
-    public function signupUser($email, $role, $password, $getToken = null){
+    public function signupUser($email, $password, $getToken = null){
         
         // Buscar si existe el usuario con sus credenciales
          $user = User::where([
@@ -36,6 +36,7 @@ class JwtAuth{
               'email'   =>      $user->email,
               'name'    =>      $user->name,
               'surname' =>      $user->surname,
+              'role'    =>      $user->role,
               'phone'   =>      $user->phone,
               'address' =>      $user->address,
               'image'   =>      $user->image,
@@ -73,7 +74,7 @@ class JwtAuth{
          
         // Comprobar si son correctas(objeto)
         $signupCommerce = false;
-        if(is_object($user)){
+        if(is_object($commerce)){
             $signupCommerce = true;
         }
         
@@ -81,16 +82,17 @@ class JwtAuth{
         if($signupCommerce){
             
             $token = array(
-              'id'      =>            $user->id,
-              'email'   =>            $user->email,
-              'name_owner'    =>      $user->name_owner,
-              'name_commerce' =>      $user->name_commerce,
-              'cell'   =>             $user->cell,
-              'tell'   =>             $user->tell,
-              'recovery_email' =>     $user->recovery_email,
-              'description' =>        $user->description,
-              'address' =>            $user->address,
-              'image'   =>            $user->image,
+              'id'      =>            $commerce->id,
+              'email'   =>            $commerce->email,
+              'name_owner'    =>      $commerce->name_owner,
+              'name_commerce' =>      $commerce->name_commerce,
+              'role' =>               $commerce->role,
+              'cell'   =>             $commerce->cell,
+              'tell'   =>             $commerce->tell,
+              'recovery_email' =>     $commerce->recovery_email,
+              'description' =>        $commerce->description,
+              'address' =>            $commerce->address,
+              'image'   =>            $commerce->image,
               'iat'     =>            time(),
               'exp'     =>            time() + (7 * 24 * 60 * 60)
             );

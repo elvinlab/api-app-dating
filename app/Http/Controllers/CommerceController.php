@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\User;
+use App\Commerce;
 
-class UserController extends Controller
+class CommerceController extends Controller
 {
     public function register(Request $request) {
 
-        // Recorger los datos del usuario por post
+        // Recorger los datos del comercio por post
         $json = $request->input('json', null);
         $params = json_decode($json); // objeto
         $params_array = json_decode($json, true); // array
@@ -22,11 +22,12 @@ class UserController extends Controller
 
             // Validar datos
             $validate = \Validator::make($params_array, [
-                        'name' => 'required|alpha',
-                        'email' => 'required|email|unique:users',
+                        'email' => 'required|email|unique:commerces',
                         'password' => 'required',
+                        'name_owner' => 'required',
+                        'name_commerce' => 'required',
+                        'tell' => 'required',
                         'address' => 'required',
-                        'phone' => 'required'
             ]);
 
             if ($validate->fails()) {
@@ -34,7 +35,7 @@ class UserController extends Controller
                 $data = array(
                     'status' => 'error',
                     'code' => 404,
-                    'message' => 'El usuario no se ha creado',
+                    'message' => 'El comercio no se ha creado',
                     'errors' => $validate->errors()
                 );
             } else {
@@ -42,23 +43,26 @@ class UserController extends Controller
                 // Cifrar la contraseña
                 $pwd = hash('sha256', $params->password);
 
-                // Crear el usuario
-                $user = new User();
-                $user->name = $params_array['name'];
-                $user->surname = $params_array['surname'];
-                $user->email = $params_array['email'];
-                $user->password = $pwd;
-                $user->role = 'ROLE_USER';
-                $user->	phone = $params_array['phone'];
-                $user->	address = $params_array['address'];
-                // Guardar el usuario
-                $user->save();
+                // Crear el comercio
+                $commerce = new Commerce();
+                $commerce->email = $params_array['email'];
+                $commerce->password = $pwd;
+                $commerce->name_owner = $params_array['name_owner'];
+                $commerce->name_commerce = $params_array['name_commerce'];
+                $commerce->role = 'ROLE_COMMERCE';
+                $commerce->cell = $params_array['cell'];
+                $commerce->tell = $params_array['tell'];
+                $commerce->recovery_email = $params_array['recovery_email'];
+                $commerce->description = $params_array['description'];
+                $commerce->	address = $params_array['address'];
+                // Guardar el comercio
+                $commerce->save();
 
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
-                    'message' => 'El usuario se ha creado correctamente',
-                    'user' => $user
+                    'message' => 'El comercio se ha creado correctamente',
+                    'commerce' => $commerce
                 );
             }
         } else {
@@ -90,10 +94,10 @@ class UserController extends Controller
 
         if ($validate->fails()) {
             // La validación ha fallado
-            $signupUser = array(
+            $signupcommerce = array(
                 'status' => 'error',
                 'code' => 404,
-                'message' => 'El usuario no se ha podido identificar',
+                'message' => 'El comercio no se ha podido identificar',
                 'errors' => $validate->errors()
             );
         } else {
@@ -101,14 +105,14 @@ class UserController extends Controller
             $pwd = hash('sha256', $params->password);
 
             // Devolver token o datos
-            $signupUser = $jwtAuth->signupUser($params->email, $pwd);
+            $signupcommerce = $jwtAuth->signupcommerce($params->email, $pwd);
 
             if (!empty($params->gettoken)) {
-                $signupUser = $jwtAuth->signupUser($params->email, $pwd, true);
+                $signupcommerce = $jwtAuth->signupcommerce($params->email, $pwd, true);
             }
         }
 
-        return response()->json($signupUser, 200);
-    }
+        return response()->json($signupcommerce, 200);
+    }   
 
 }
