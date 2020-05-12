@@ -82,19 +82,19 @@ class JwtAuth{
         if($signupCommerce){
             
             $token = array(
-              'id'      =>            $commerce->id,
-              'email'   =>            $commerce->email,
-              'name_owner'    =>      $commerce->name_owner,
-              'name_commerce' =>      $commerce->name_commerce,
-              'role' =>               $commerce->role,
-              'cell'   =>             $commerce->cell,
-              'tell'   =>             $commerce->tell,
-              'recovery_email' =>     $commerce->recovery_email,
-              'description' =>        $commerce->description,
-              'address' =>            $commerce->address,
-              'image'   =>            $commerce->image,
-              'iat'     =>            time(),
-              'exp'     =>            time() + (7 * 24 * 60 * 60)
+              'id'             =>   $commerce->id,
+              'email'          =>   $commerce->email,
+              'name_owner'     =>   $commerce->name_owner,
+              'name_commerce'  =>   $commerce->name_commerce,
+              'role'           =>   $commerce->role,
+              'cell'           =>   $commerce->cell,
+              'tell'           =>   $commerce->tell,
+              'recovery_email' =>   $commerce->recovery_email,
+              'description'    =>   $commerce->description,
+              'address'        =>   $commerce->address,
+              'image'          =>   $commerce->image,
+              'iat'            =>   time(),
+              'exp'            =>   time() + (7 * 24 * 60 * 60)
             );
             
             $jwt = JWT::encode($token, $this->key, 'HS256');
@@ -123,13 +123,16 @@ class JwtAuth{
         try{
             $jwt = str_replace('"', '', $jwt);
             $decoded = JWT::decode($jwt, $this->key, ['HS256']);
+
+            
         }catch(\UnexpectedValueException $e){
             $auth = false;
         }catch(\DomainException $e){
             $auth = false;
         }
         
-        if(!empty($decoded) && is_object($decoded) && isset($decoded->sub)){
+        if(!empty($decoded) && is_object($decoded) && isset($decoded->id)){
+          
             $auth = true;  
         }else{
             $auth = false;
