@@ -26,7 +26,6 @@ class CreateCommercesTable extends Migration
             $table->string('description')->nullable();
             $table->string('address');
             $table->string('image')->nullable();
-            $table->rememberToken();
             $table->timestamps();
         });
     }
