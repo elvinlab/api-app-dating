@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Cargando clases
+use App\Http\Middleware\ApiAuthMiddleware;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/api/user/register', 'UserController@register');
 Route::post('/api/user/login', 'UserController@login');
 Route::put('/api/user/update', 'UserController@update');
-//Aqui va algo
+Route::post('/api/user/upload' ,'UserController@upload')->middleware(ApiAuthMiddleware::class);
 Route::get('/api/user/avatar/{filename}', 'UserController@getImage');
 Route::get('/api/user/detail/{id}', 'UserController@detail');
 
@@ -26,6 +29,6 @@ Route::get('/api/user/detail/{id}', 'UserController@detail');
 Route::post('/api/commerce/register', 'CommerceController@register');
 Route::post('/api/commerce/login', 'CommerceController@login');
 Route::put('/api/commerce/update', 'CommerceController@update');
-//Aqui va algo
+Route::post('/api/commerce/upload' ,'CommerceController@upload')->middleware(ApiAuthMiddleware::class);
 Route::get('/api/commerce/avatar/{filename}', 'CommerceController@getImage');
 Route::get('/api/commerce/detail/{id}', 'CommerceController@detail');

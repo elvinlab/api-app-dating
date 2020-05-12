@@ -115,4 +115,130 @@ class CommerceController extends Controller
         return response()->json($signupcommerce, 200);
     }   
 
+    public function update(Request $request) {
+
+        // Comprobar si el comercio está identificado
+        $token = $request->header('Authorization');
+        $jwtAuth = new \JwtAuth();
+        
+        $checkToken = $jwtAuth->checkToken($token);
+        
+        // Recoger los datos por post
+        $json = $request->input('json', null);
+        $params_array = json_decode($json, true);
+
+        if ($checkToken && !empty($params_array)) {
+
+            // Sacar comercio identificado
+            $commerce = $jwtAuth->checkToken($token, true);
+
+            // Validar datos
+            $validate = \Validator::make($params_array, [
+                'email' => 'required|email|unique:commerces,' . $commerce->id,
+                'password' => 'required',
+                'name_owner' => 'required',
+                'name_commerce' => 'required',
+                'tell' => 'required',
+                'address' => 'required'
+            ]);
+
+            // Quitar los campos que no quiero actualizar
+            unset($params_array['id']);
+            unset($params_array['role']);
+            unset($params_array['created_at']);
+
+            // Actualizar comercio en bbdd
+            $commerce_update = Commerce::where('id', $commerce->id)->update($params_array);
+
+            // Devolver array con resultado
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'commerce' => $commerce,
+                'changes' => $params_array
+            );
+        } else {
+            $data = array(
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'El comercio no está identificado.'
+            );
+        }
+
+        return response()->json($data, $data['code']);
+    }
+
+    public function upload(Request $request) {
+        // Recoger datos de la petición
+        $image = $request->file('file0');
+        $token = $request->header('Authorization');
+        
+        $jwtAuth = new \JwtAuth();        
+        $commerce_image = $jwtAuth->checkToken($token, true);
+
+        // Validacion de imagen
+        $validate = \Validator::make($request->all(), [
+                    'file0' => 'required|image|mimes:jpg,jpeg,png,gif'
+        ]);
+
+        // Guardar imagen
+        if (!$image || $validate->fails()) {
+            $data = array(
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'Error al subir imagen'
+            );
+        } else {
+            //Guardamos en local storage la imagen 
+            $image_name = time() . $image->getClientOriginalName();
+            \Storage::disk('commerces')->put($image_name, \File::get($image));
+
+            //Guardamos el nombre de la imagen en la base de datos
+             commerce::where('id', $commerce_image->id)->update(array('image' => $image_name));
+
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'image' => $image_name
+            );
+        }
+
+        return response()->json($data, $data['code']);
+    }
+
+    public function getImage($filename) {
+        $isset = \Storage::disk('commerces')->exists($filename);
+        if ($isset) {
+            $file = \Storage::disk('commerces')->get($filename);
+            return new Response($file, 200);
+        } else {
+            $data = array(
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'La imagen no existe.'
+            );
+
+            return response()->json($data, $data['code']);
+        }
+    }
+
+    public function detail($id) {
+        $commerce = Commerce::find($id);
+
+        if (is_object($commerce)) {
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'commerce' => $commerce
+            );
+        } else {
+             $data = array(
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'El comercio no existe.'
+            );
+        }
+        
+        return response()->json($data, $data['code']);
+    }
 }
