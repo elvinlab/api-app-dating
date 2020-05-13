@@ -32,3 +32,7 @@ Route::put('/api/commerce/update', 'CommerceController@update');
 Route::post('/api/commerce/upload' ,'CommerceController@upload')->middleware(ApiAuthMiddleware::class);
 Route::get('/api/commerce/avatar/{filename}', 'CommerceController@getImage');
 Route::get('/api/commerce/detail/{id}', 'CommerceController@detail');
+
+
+//Rutas del controlador Categoria
+Route::resource('/api/category', 'CategoryController',['except' => ['create','edit']]);
