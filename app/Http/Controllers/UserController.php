@@ -71,8 +71,7 @@ class UserController extends Controller
 
         return response()->json($data, $data['code']);
     }
-
-
+    
     public function login(Request $request) {
 
         $jwtAuth = new \JwtAuth();
@@ -116,30 +115,26 @@ class UserController extends Controller
         // Comprobar si el usuario está identificado
         $token = $request->header('Authorization');
         $jwtAuth = new \JwtAuth();
-        
         $checkToken = $jwtAuth->checkToken($token);
         
         // Recoger los datos por post
         $json = $request->input('json', null);
-        $params_array = json_decode($json, true);
+        $params =  json_decode($json);
 
-        if ($checkToken && !empty($params_array)) {
+        if ($checkToken && !empty($params)) {
 
             // Sacar usuario identificado
             $user = $jwtAuth->checkToken($token, true);
 
-            // Validar datos
-            $validate = \Validator::make($params_array, [
-                'name' => 'required|alpha',
-                'email' => 'required|email|unique:users',
-                'password' => 'required',
-                'address' => 'required',
-                'phone' => 'required',
-                'email' => 'required|email|unique:users,' . $user->id
-            ]);
+                //en angular validar si se modifica o no la contraseña
+                //$pwd = hash('sha256', $params->password);
+                //$params->password = $pwd;
+                $params_array =  (array)$params;
 
             // Quitar los campos que no quiero actualizar
             unset($params_array['id']);
+            unset($params_array['name']);
+            unset($params_array['email']);
             unset($params_array['role']);
             unset($params_array['created_at']);
 

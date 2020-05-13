@@ -21,7 +21,8 @@ class JwtAuth{
                 'email' => $email,
                 'password' => $password
          ])->first();
-         
+        
+
         // Comprobar si son correctas(objeto)
         $signupUser = false;
         if(is_object($user)){

@@ -134,10 +134,6 @@ class CommerceController extends Controller
 
             // Validar datos
             $validate = \Validator::make($params_array, [
-                'email' => 'required|email|unique:commerces,' . $commerce->id,
-                'password' => 'required',
-                'name_owner' => 'required',
-                'name_commerce' => 'required',
                 'tell' => 'required',
                 'address' => 'required'
             ]);
