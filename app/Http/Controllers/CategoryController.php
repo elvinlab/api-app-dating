@@ -165,4 +165,6 @@ class CategoryController extends Controller
         }
         return response()->json($response,$response['code']);
     }
+
+    //Comit de Adrian
 }
