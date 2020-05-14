@@ -22,7 +22,6 @@ class CreateSalesTable extends Migration
             $table->timestamps();
 
             $table->foreign('service_id')->references('id')->on('services');
-            $table->foreign('favorite_id')->references('id')->on('user_commerce');
         });
     }
 

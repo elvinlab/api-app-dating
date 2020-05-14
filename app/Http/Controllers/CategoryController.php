@@ -7,6 +7,7 @@ use App\Category;
 
 class CategoryController extends Controller
 {
+    //
     public function __construct(){
         //middleware
     }
@@ -41,28 +42,37 @@ class CategoryController extends Controller
     public function store(Request $request){ //POST
         //Guardará un nuevo elemento
         $json=$request->input('json',null);
-        $data = json_decode($json,true);
+        $data = json_decode($json,true);//objeto
+
         if(!empty($data)){
-            $data=array_map('trim',$data);
+            $data=array_map('trim',$data);//Limpiar datos
+
             $rules=[
-                'name'=>'required|alpha'
+                'name'=>'required|alpha',
+                'descripton' =>'required'
             ];
-            $validate=\validator($data,$rules);
+
+            $validate=\validator($data,$rules);//valida datos
+
             if($validate->fails()){
                 $response=array(
                     'status'=>'error',
                     'code'=>406,
-                    'message'=>'los datos enviados son incorrectos',
+                    'message'=>'La Categoria no se ha creado.',
                     'errors'=>$validate->errors()
                 );
             }else{
                 $category= new Category();
                 $category->name=$data['name'];
-                $category->save();
+                $category->description=$data['descripton'];
+
+                $category->save();//Se guarda la categoria
+
                 $response=array(
                     'status'=>'success',
                     'code'=>201,
-                    'message'=>'Datos almacenados satisfactoriamente'
+                    'message'=>'Datos almacenados satisfactoriamente',
+                    'category'=>$category
                 );
             }
         }
@@ -70,7 +80,7 @@ class CategoryController extends Controller
             $response=array(
                 'status'=>'error',
                 'code'=>400,
-                'message'=>'faltan parametros'
+                'message'=>'Faltan campos.'
             );
         }
         return response()->json($response,$response['code']);
@@ -79,12 +89,15 @@ class CategoryController extends Controller
         //Actualiza un elemento
         $json= $request->input('json',null);
         $data=json_decode($json,true);
+
         if(!empty($data)){
             $data=array_map('trim',$data);
+            //Da
             $rules=[
-                'id'=>'required',
-                'name'=>'required|alpha'
+                'name'=>'required|alpha',
+                'descripton'=>'required'
             ];
+
             $validate=\validator($data,$rules);
             if($validate->fails()){
                 $response=array(
@@ -96,14 +109,16 @@ class CategoryController extends Controller
             }
             else{
                 $id=$data['id'];
+
+                //Sacar parametros
                 unset($data['id']);
-                unset($data['created_at']);
+
                 $updated=Category::where('id',$id)->update($data);
                 if($updated>0){
                     $response=array(
                     'status'=>'success',
                     'code'=>200,
-                    'message'=>'Datos actualizados satisfactoriamente'
+                    'message'=>'Categoria actualizada satisfactoriamente'
                     );
                 }else{
                     $response=array(
@@ -150,6 +165,4 @@ class CategoryController extends Controller
         }
         return response()->json($response,$response['code']);
     }
-
-
 }

@@ -35,4 +35,4 @@ Route::get('/api/commerce/detail/{id}', 'CommerceController@detail');
 
 
 //Rutas del controlador Categoria
-Route::resource('/api/category', 'CategoryController',['except' => ['create','edit']]);
+Route::resource('/api/category', 'CategoryController',['except' => ['index','show']]);
