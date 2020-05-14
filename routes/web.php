@@ -34,5 +34,5 @@ Route::get('/api/commerce/avatar/{filename}', 'CommerceController@getImage');
 Route::get('/api/commerce/detail/{id}', 'CommerceController@detail');
 
 
-//Rutas del controlador Categoria
-Route::resource('/api/category', 'CategoryController',['except' => ['index','show']]);
+  // Rutas del controlador de Categoria
+  Route::resource('/api/category', 'CategoryController');
