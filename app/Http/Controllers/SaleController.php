@@ -52,7 +52,6 @@ class SaleController extends Controller {
             $validate = \Validator::make($params_array, [
                 'service_id' => 'required',
                 'amount'=>'required',
-                'iva'=>'required'
             ]);
 
             // Guardar la ventas
@@ -66,7 +65,6 @@ class SaleController extends Controller {
                 $Sale = new Sale();
                 $Sale->service_id = $params_array['service_id'];
                 $Sale->amount = $params_array['amount'];
-                $Sale->iva = $params_array['iva'];
                 $Sale->save();
 
                  $data = [
@@ -97,7 +95,6 @@ class SaleController extends Controller {
             $validate = \Validator::make($params_array, [
                 'service_id' => 'required',
                 'amount'=>'required',
-                'iva'=>'required'
             ]);
 
             // Quitar lo que no quiero actualizar
@@ -125,5 +122,5 @@ class SaleController extends Controller {
         return response()->json($data, $data['code']);
     }
 
-    //No re sealiza elmininar porque esto no lo puede hacer ninguno de estos roles, seria solo el rol de admin que en este proyecto no entra
+   //NO SE ELIMINAN LOS REGISTROS DE VENTA
 }

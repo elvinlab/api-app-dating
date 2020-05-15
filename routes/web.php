@@ -44,3 +44,6 @@ Route::get('/api/commerce/detail/{id}', 'CommerceController@detail');
      
     // Rutas del controlador de Venta
       Route::resource('/api/sale', 'SaleController'); //CRUD
+
+      // Rutas del controlador de Servicio
+      Route::resource('/api/service', 'ServiceController'); //CRUD

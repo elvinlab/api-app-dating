@@ -18,14 +18,12 @@ class CreateAppointmentsTable extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('commerce_id')->unsigned();
             $table->bigInteger('service_id')->unsigned();
-            $table->bigInteger('schedule_id')->unsigned();
             $table->string('status');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('commerce_id')->references('id')->on('commerces');
             $table->foreign('service_id')->references('id')->on('services');
-            $table->foreign('schedule_id')->references('id')->on('schedules');
         });
     }
 

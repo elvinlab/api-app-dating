@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
+    protected $fillable = [
+        'commerce_id', 'category_id', 'name', 'description', 'price',
+    ];
+
     public function category(){// Muchos Servicios estaran en una categoria
         return $this->belongsTo('App\Category');//Category es foranea en services
     }
