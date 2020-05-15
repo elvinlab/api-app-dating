@@ -76,7 +76,7 @@ class PromotionController extends Controller
                 $data = [
                   'code' => 400,
                   'status' => 'error',
-                  'message' => 'No se ha guardado la promotion, faltan datos',
+                  'message' => 'No se ha guardado la promocion, faltan datos',
                   'error' => $validate->errors()
                 ];
             }else{

@@ -35,7 +35,7 @@ class SaleController extends Controller {
             $data = [
                 'code' => 404,
                 'status' => 'error',
-                'message' => 'La ventas no existe'
+                'message' => 'Las ventas no existen.'
             ];
         }
 
@@ -95,7 +95,9 @@ class SaleController extends Controller {
         if(!empty($params_array)){
             // Validar los datos
             $validate = \Validator::make($params_array, [
-                'name' => 'required'
+                'service_id' => 'required',
+                'amount'=>'required',
+                'iva'=>'required'
             ]);
 
             // Quitar lo que no quiero actualizar
@@ -115,7 +117,7 @@ class SaleController extends Controller {
             $data = [
                     'code' => 400,
                     'status' => 'error',
-                    'message' => 'No has enviado ninguna ventas.'
+                    'message' => 'No has enviado ninguna venta.'
                 ];
         }
         

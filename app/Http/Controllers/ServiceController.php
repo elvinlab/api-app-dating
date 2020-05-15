@@ -14,13 +14,12 @@ class ServiceController extends Controller
         $this->middleware('api.auth', ['except' => [
             'index',
             'show',
-            'getImage',
             'getServicesBycommerce'
         ]]);
     }
     
     public function index(){
-        $services = Service::all()->load('commerce');
+        $services = Service::all()->load('commerce', 'category');
         
         return response()->json([
             'code' => 200,
@@ -42,7 +41,7 @@ class ServiceController extends Controller
             $data = [
                 'code' => 404,
                 'status' => 'error',
-                'message' => 'el servicio no existe'
+                'message' => 'El servicio no existe.'
             ];
         }
         
@@ -51,25 +50,23 @@ class ServiceController extends Controller
     
     public function store(Request $request){
         // Recoger datos por Service
-        $json = $request->input('json', null);
-        $params = json_decode($json);
-        $params_array = json_decode($json, true);
+        $json = $request->input('json', null);//la respuesta lo convierte a JSON
+        $params = json_decode($json);//Decodifica ese JSON a objeto
+        $params_array = json_decode($json, true);//Pasa ese JSON a array
 
         //var_dump($params); die();
         
         if(!empty($params_array)){
-            // Conseguir usuario identificado
+            // Conseguir comercio identificado
             $commerce = $this->getIdentity($request);
             
             // Validar los datos
             $validate = \Validator::make($params_array, [
                 'commerce_id'=>'required',
-                'coupon'=>'required',
-                'max'=>'required',
-                'expiry'=>'required',
+                'category_id'=>'required',
+                'name'=>'required',
                 'description'=>'required',
-                'discount'=>'required',
-                'image'=>'required',
+                'price'=>'required'
 
             ]);
             
@@ -77,25 +74,23 @@ class ServiceController extends Controller
                 $data = [
                   'code' => 400,
                   'status' => 'error',
-                  'message' => 'No se ha guardado la Service, faltan datos',
+                  'message' => 'No se ha guardado el Servicio, faltan datos',
                   'error' => $validate->errors()
                 ];
             }else{
                 // Guardar el articulo
-                $Service = new Service();
-                $Service->commerce_id = $params->commerce_id;
-                $Service->coupon = $params->coupon;
-                $Service->max = $params->max;
-                $Service->expiry = $params->expiry;
-                $Service->description = $params->description;
-                $Service->image = $params->image;
-                $Service->discount = $params->discount;
-                $Service->save();
+                $service = new Service();
+                $service->commerce_id = $params->commerce_id;
+                $service->category_id = $params->category_id;
+                $service->name = $params->name;
+                $service->description = $params->description;
+                $service->price = $params->price;
+                $service->save();
                 
                 $data = [
                     'code' => 200,
                     'status' => 'success',
-                    'Service' => $Service
+                    'Service' => $service
                   ];
             }
             
@@ -120,19 +115,17 @@ class ServiceController extends Controller
         $data = array(
             'code' => 400,
             'status' => 'error',
-            'message' => 'Datos enviados incorrectos'
+            'message' => 'Datos enviados incorrectamente'
         );
         
         if(!empty($params_array)){
             // Validar datos
             $validate = \Validator::make($params_array, [
                 'commerce_id'=>'required',
-                'coupon'=>'required',
-                'max'=>'required',
-                'expiry'=>'required',
+                'category_id'=>'required',
+                'name'=>'required',
                 'description'=>'required',
-                'discount'=>'required',
-                'image'=>'required',
+                'price'=>'required'
             ]);
 
             if($validate->fails()){
@@ -150,21 +143,21 @@ class ServiceController extends Controller
             $commerce = $this->getIdentity($request);
 
             // Buscar el registro a actualizar
-            $Service = Service::where('id', $id)
+            $service = Service::where('id', $id)
                     ->where('commerce_id', $commerce->id)
                     ->first();
 
 
-            if(!empty($Service) && is_object($Service)){
+            if(!empty($service) && is_object($service)){
                 
                 // Actualizar el registro en concreto
-                $Service->update($params_array);
+                $service->update($params_array);
               
                 // Devolver algo
                 $data = array(
                     'code' => 200,
                     'status' => 'success',
-                    'Service' => $Service,
+                    'Service' => $service,
                     'changes' => $params_array
                 );
             }
@@ -222,63 +215,7 @@ class ServiceController extends Controller
         return $commerce;
     }
     
-    public function upload($id, Request $request){
-        // Recoger la imagen de la petición
-
-        $image = $request->file('file0');
-               
-        // Validar imagen
-        $validate = \Validator::make($request->all(), [
-           'file0' => 'required|image|mimes:jpg,jpeg,png,gif' 
-        ]);
-        
-        // Guardar la imagen
-        if(!$image || $validate->fails()){
-            $data = [
-                'code' => 400,
-                'status' => 'error',
-                'message' => 'Error al subir la imagen'
-            ];
-        }else{
-            $image_name = time().$image->getClientOriginalName();
-            
-            \Storage::disk('Services')->put($image_name, \File::get($image));
-
-             //Guardamos el nombre de la imagen en la base de datos
-             Service::where('id', $id)->update(array('image' => $image_name));
-            
-            $data = [
-                'code' => 200,
-                'status' => 'success',
-                'image' => $image_name
-            ];
-        }
-        
-        // Devolver datos
-        return response()->json($data, $data['code']);
-    }
     
-    public function getImage($filename){
-        // Comprobar si existe el fichero
-        $isset = \Storage::disk('Services')->exists($filename);
-        
-        if($isset){
-            // Conseguir la imagen
-            $file = \Storage::disk('Services')->get($filename);
-            
-            // Devolver la imagen
-            return new Response($file, 200);
-        }else{
-            $data = [
-                'code' => 404,
-                'status' => 'error',
-                'message' => 'La imagen no existe'
-            ];
-        }
-        
-        return response()->json($data, $data['code']);
-    }
-
     public function getServicesBycommerce($id){
         $Services = Service::where('commerce_id',$id)->get();
         
