@@ -18,6 +18,7 @@ class CreatePromotionsTable extends Migration
             $table->bigInteger('commerce_id')->unsigned();
             $table->string('coupon')->unique();
             $table->integer('max');
+            $table->integer('amount')->nullable();
             $table->dateTime('expiry');
             $table->longText('description');
             $table->string('image')->nullable();

@@ -63,7 +63,7 @@ class CategoryController extends Controller {
             }else{
                 $category = new Category();
                 $category->name = $params_array['name'];
-                $category->name = $params_array['description'];
+                $category->descripton = $params_array['descripton'];
                 $category->save();
 
                  $data = [
@@ -119,4 +119,6 @@ class CategoryController extends Controller {
         // Devolver respuesta
         return response()->json($data, $data['code']);
     }
+
+    //No re sealiza elmininar porque esto no lo puede hacer ninguno de estos roles, seria solo el rol de admin que en este proyecto no entra
 }

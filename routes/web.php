@@ -36,3 +36,8 @@ Route::get('/api/commerce/detail/{id}', 'CommerceController@detail');
 
   // Rutas del controlador de Categoria
   Route::resource('/api/category', 'CategoryController');
+    
+  // Rutas del controlador de Categoria
+    Route::resource('/api/promotion', 'PromotionController'); //CRUD
+    Route::post('/api/promotion/upload/{id}', 'PromotionController@upload');
+    Route::get('/api/promotion/getpromos/{id}', 'PromotionController@getPromotionsBycommerce'); //optener promos por medio de la llave foranea
