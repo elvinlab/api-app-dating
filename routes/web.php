@@ -52,4 +52,4 @@ Route::get('/api/service/getservicecommerce/{id}', 'ServiceController@getService
 // Rutas del controlador de Cita
 Route::resource('/api/appointment', 'AppointmentController'); //CRUD
 Route::get('/api/appointment/getdatecommerce/{id}', 'AppointmentController@getAppointmentsBycommerce'); 
-Route::get('/api/appointment/getdateuser/{id}', 'AppointmentController@getAppointmentsByuser'); 
+Route::get('/api/appointment/getdateuser/{id}', 'AppointmentController@getAppointmentsByuser');
