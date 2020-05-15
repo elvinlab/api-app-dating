@@ -34,4 +34,9 @@ class User extends Authenticatable
      * @var array
      */
 
+    public function appointments()
+    {
+        return $this->hasMany('App\Appointment');
+    }
+
 }

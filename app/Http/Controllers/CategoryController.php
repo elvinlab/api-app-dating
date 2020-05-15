@@ -119,6 +119,5 @@ class CategoryController extends Controller {
         // Devolver respuesta
         return response()->json($data, $data['code']);
     }
-
-    //No re sealiza elmininar porque esto no lo puede hacer ninguno de estos roles, seria solo el rol de admin que en este proyecto no entra
+    //No se puede eliminar porque esto no lo puede hacer ninguno de estos roles, seria solo el rol de admin que en este proyecto no entra
 }

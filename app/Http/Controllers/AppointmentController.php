@@ -4,44 +4,47 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Appointment;
+use App\User;
+use App\Commerce;
 use App\Service;
-use App\Category;
 use App\Helpers\JwtAuth;
 
-class ServiceController extends Controller
+class AppointmentController extends Controller
 {
     public function __construct() {
         $this->middleware('api.auth', ['except' => [
             'index',
             'show',
-            'getServicesBycommerce'
+            'getAppointmentsBycommerce',
+            'getAppointmentsByuser'
         ]]);
     }
     
     public function index(){
-        $services = Service::all()->load('commerce', 'category');
+        $appointments = Appointment::all()->load('user','commerce', 'service');
         
         return response()->json([
             'code' => 200,
             'status' => 'success',
-            'Services' => $services
+            'Appointments' => $appointments
         ], 200);
     }
     
     public function show($id){
-        $service = Service::find($id)->load('commerce','category' );
+        $appointment = Appointment::find($id)->load('user','commerce', 'service');
         
-        if(is_object($service)){
+        if(is_object($appointment)){
            $data = [
                 'code' => 200,
                 'status' => 'success',
-                'Services' => $service
+                'Appointments' => $appointment
             ];
         }else{
             $data = [
                 'code' => 404,
                 'status' => 'error',
-                'message' => 'El servicio no existe.'
+                'message' => 'La cita no existe.'
             ];
         }
         
@@ -49,7 +52,7 @@ class ServiceController extends Controller
     }
     
     public function store(Request $request){
-        // Recoger datos por Service
+        // Recoger datos por Appointment
         $json = $request->input('json', null);//la respuesta lo convierte a JSON
         $params = json_decode($json);//Decodifica ese JSON a objeto
         $params_array = json_decode($json, true);//Pasa ese JSON a array
@@ -58,39 +61,38 @@ class ServiceController extends Controller
         
         if(!empty($params_array)){
             // Conseguir comercio identificado
-            $commerce = $this->getIdentity($request);
+            $user = $this->getIdentity($request);
             
             // Validar los datos
             $validate = \Validator::make($params_array, [
                 'commerce_id'=>'required',
-                'category_id'=>'required',
-                'name'=>'required',
-                'description'=>'required',
-                'price'=>'required'
-
+                'service_id'=>'required',
+                'schedule_day'=>'required',
+                'schedule_hour'=>'required',
             ]);
             
             if($validate->fails()){
                 $data = [
                   'code' => 400,
                   'status' => 'error',
-                  'message' => 'No se ha guardado el Servicio, faltan datos',
+                  'message' => 'No se ha guardado la cita, faltan datos',
                   'error' => $validate->errors()
                 ];
             }else{
                 // Guardar el articulo
-                $service = new Service();
-                $service->commerce_id = $commerce->id;
-                $service->category_id = $params->category_id;
-                $service->name = $params->name;
-                $service->description = $params->description;
-                $service->price = $params->price;
-                $service->save();
+                $Appointment = new Appointment();
+                $Appointment->user_id = $user->id;
+                $Appointment->commerce_id = $params->commerce_id;
+                $Appointment->service_id = $params->service_id;
+                $Appointment->status = 'PENDIENTE';
+                $Appointment->schedule_day = $params->schedule_day;
+                $Appointment->schedule_hour = $params->schedule_hour;
+                $Appointment->save();
                 
                 $data = [
                     'code' => 200,
                     'status' => 'success',
-                    'Service' => $service
+                    'Appointment' => $Appointment
                   ];
             }
             
@@ -107,7 +109,7 @@ class ServiceController extends Controller
     }
     
     public function update($id, Request $request){
-        // Recoger los datos por Service
+        // Recoger los datos por Appointment
         $json = $request->input('json', null);
         $params_array = json_decode($json, true, JSON_UNESCAPED_UNICODE);
 
@@ -122,10 +124,9 @@ class ServiceController extends Controller
             // Validar datos
             $validate = \Validator::make($params_array, [
                 'commerce_id'=>'required',
-                'category_id'=>'required',
-                'name'=>'required',
-                'description'=>'required',
-                'price'=>'required'
+                'service_id'=>'required',
+                'schedule_day'=>'required',
+                'schedule_hour'=>'required',
             ]);
 
             if($validate->fails()){
@@ -135,29 +136,28 @@ class ServiceController extends Controller
             
             // Eliminar lo que no queremos actualizar
             unset($params_array['id']);
-            unset($params_array['commerce_id']);
+            unset($params_array['user_id']);
+            unset($params_array['status']);
             unset($params_array['created_at']);
             unset($params_array['commerce']);
             
             // Conseguir usuario identificado
-            $commerce = $this->getIdentity($request);
+            $user = $this->getIdentity($request);
 
             // Buscar el registro a actualizar
-            $service = Service::where('id', $id)
-                    ->where('commerce_id', $commerce->id)
-                    ->first();
+            $appointment = Appointment::where('id', $id)->first();
 
 
-            if(!empty($service) && is_object($service)){
+            if(!empty($appointment) && is_object($appointment)){
                 
                 // Actualizar el registro en concreto
-                $service->update($params_array);
+                $appointment->update($params_array);
               
                 // Devolver algo
                 $data = array(
                     'code' => 200,
                     'status' => 'success',
-                    'Service' => $service,
+                    'Appointment' => $appointment,
                     'changes' => $params_array
                 );
             }
@@ -167,10 +167,9 @@ class ServiceController extends Controller
                 'id' => $id,
                 'commerce_id' => $commerce->sub
             ];
-            $Service = Service::updateOrCreate($where, $params_array);
+            $Appointment = Appointment::updateOrCreate($where, $params_array);
              * 
              */
-
             
         }
         
@@ -182,25 +181,23 @@ class ServiceController extends Controller
         $commerce = $this->getIdentity($request);
 
         //  Conseguir el registro
-        $Service = Service::where('id', $id)
-                    ->where('commerce_id', $commerce->id)
-                    ->first();
+        $appointment = Appointment::where('id', $id)->first();
         
-        if(!empty($Service)){
+        if(!empty($appointment)){
             // Borrarlo
-            $Service->delete();
+            $appointment->delete();
 
             // Devolver algo
             $data = [
               'code' => 200,
               'status' => 'success',
-              'Service' => $Service
+              'Appointment' => $appointment
             ];
         }else{
             $data = [
               'code' => 404,
               'status' => 'error',
-              'message' => 'El Service no existe'
+              'message' => 'la cita no existe'
             ]; 
         }
         
@@ -210,18 +207,27 @@ class ServiceController extends Controller
     private function getIdentity($request){
         $jwtAuth = new JwtAuth();
         $token = $request->header('Authorization', null);
-        $commerce = $jwtAuth->checkToken($token, true);
+        $user = $jwtAuth->checkToken($token, true);
         
-        return $commerce;
+        return $user;
     }
     
     
-    public function getServicesBycommerce($id){
-        $Services = Service::where('commerce_id',$id)->get();
+    public function getAppointmentsBycommerce($id){
+        $appointments = Appointment::where('commerce_id',$id)->get();
         
         return response()->json([
             'status' => 'success',
-            'Services' => $Services
+            'Appointments' => $appointments
+        ], 200);
+    }
+
+    public function getAppointmentsByuser($id){
+        $appointments = Appointment::where('user_id',$id)->get();
+        
+        return response()->json([
+            'status' => 'success',
+            'Appointments' => $appointments
         ], 200);
     }
 }

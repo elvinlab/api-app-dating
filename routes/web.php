@@ -43,7 +43,15 @@ Route::get('/api/commerce/detail/{id}', 'CommerceController@detail');
     Route::get('/api/promotion/getpromos/{id}', 'PromotionController@getPromotionsBycommerce'); //optener promos por medio de la llave foranea
      
     // Rutas del controlador de Venta
-      Route::resource('/api/sale', 'SaleController'); //CRUD
+    Route::resource('/api/sale', 'SaleController'); //CRUD
 
-      // Rutas del controlador de Servicio
-      Route::resource('/api/service', 'ServiceController'); //CRUD
+    // Rutas del controlador de Servicio
+    Route::resource('/api/service', 'ServiceController'); //CRUD
+
+    // Rutas del controlador de Servicio
+    Route::resource('/api/service', 'ServiceController'); //CRUD
+
+    // Rutas del controlador de Cita
+    Route::resource('/api/appointment', 'AppointmentController'); //CRUD
+    Route::get('/api/appointment/getdatecommerce/{id}', 'AppointmentController@getAppointmentsBycommerce'); 
+    Route::get('/api/appointment/getdateuser/{id}', 'AppointmentController@getAppointmentsByuser'); 

@@ -20,4 +20,9 @@ class Service extends Model
     public function commerce(){//Muchos Servicios estaran en un comercio
         return $this->belongsTo('App/Commerce');
     }
+
+    public function appointments()
+    {
+        return $this->hasMany('App\Appointment');
+    }
 }
