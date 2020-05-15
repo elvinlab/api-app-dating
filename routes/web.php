@@ -33,25 +33,23 @@ Route::post('/api/commerce/upload' ,'CommerceController@upload')->middleware(Api
 Route::get('/api/commerce/avatar/{filename}', 'CommerceController@getImage');
 Route::get('/api/commerce/detail/{id}', 'CommerceController@detail');
 
-
-  // Rutas del controlador de Categoria
-  Route::resource('/api/category', 'CategoryController');
+// Rutas del controlador de Categoria
+Route::resource('/api/category', 'CategoryController');
     
-  // Rutas del controlador de promocion
-    Route::resource('/api/promotion', 'PromotionController'); //CRUD
-    Route::post('/api/promotion/upload/{id}', 'PromotionController@upload');
-    Route::get('/api/promotion/getpromos/{id}', 'PromotionController@getPromotionsBycommerce'); //optener promos por medio de la llave foranea
-     
-    // Rutas del controlador de Venta
-    Route::resource('/api/sale', 'SaleController'); //CRUD
+// Rutas del controlador de promocion
+Route::resource('/api/promotion', 'PromotionController'); //CRUD
+Route::get('/api/promotion/getpromos/{id}', 'PromotionController@getPromotionsBycommerce'); //optener promos por medio de la llave foranea
+Route::post('/api/promotion/upload' ,'PromotionController@upload')->middleware(ApiAuthMiddleware::class);
+Route::get('/api/promotion/images/{filename}', 'PromotionController@getImage');
+   
+// Rutas del controlador de Venta   
+Route::resource('/api/sale', 'SaleController'); //CRUD
 
-    // Rutas del controlador de Servicio
-    Route::resource('/api/service', 'ServiceController'); //CRUD
+// Rutas del controlador de Servicio
+Route::resource('/api/service', 'ServiceController'); //CRUD
+Route::get('/api/service/getservicecommerce/{id}', 'ServiceController@getServicesBycommerce');
 
-    // Rutas del controlador de Servicio
-    Route::resource('/api/service', 'ServiceController'); //CRUD
-
-    // Rutas del controlador de Cita
-    Route::resource('/api/appointment', 'AppointmentController'); //CRUD
-    Route::get('/api/appointment/getdatecommerce/{id}', 'AppointmentController@getAppointmentsBycommerce'); 
-    Route::get('/api/appointment/getdateuser/{id}', 'AppointmentController@getAppointmentsByuser'); 
+// Rutas del controlador de Cita
+Route::resource('/api/appointment', 'AppointmentController'); //CRUD
+Route::get('/api/appointment/getdatecommerce/{id}', 'AppointmentController@getAppointmentsBycommerce'); 
+Route::get('/api/appointment/getdateuser/{id}', 'AppointmentController@getAppointmentsByuser'); 

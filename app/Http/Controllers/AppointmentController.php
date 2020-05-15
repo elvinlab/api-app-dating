@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Appointment;
-use App\User;
-use App\Commerce;
-use App\Service;
 use App\Helpers\JwtAuth;
 
 class AppointmentController extends Controller

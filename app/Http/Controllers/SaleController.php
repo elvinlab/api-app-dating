@@ -102,7 +102,7 @@ class SaleController extends Controller {
             unset($params_array['created_at']);
 
             // Actualizar el registro(ventas)
-            $Sale = Sale::where('id', $id)->update($params_array);
+            $sale = Sale::where('id', $id)->update($params_array);
             
             $data = [
                 'code' => 200,

@@ -182,9 +182,7 @@ class ServiceController extends Controller
         $commerce = $this->getIdentity($request);
 
         //  Conseguir el registro
-        $Service = Service::where('id', $id)
-                    ->where('commerce_id', $commerce->id)
-                    ->first();
+        $Service = Service::where('id', $id)->first();
         
         if(!empty($Service)){
             // Borrarlo

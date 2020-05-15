@@ -62,7 +62,6 @@ class PromotionController extends Controller
             
             // Validar los datos
             $validate = \Validator::make($params_array, [
-                'commerce_id'=>'required',
                 'coupon'=>'required',
                 'max'=>'required',
                 'expiry'=>'required',
@@ -82,7 +81,7 @@ class PromotionController extends Controller
             }else{
                 // Guardar el articulo
                 $promotion = new Promotion();
-                $promotion->commerce_id = $params->commerce_id;
+                $promotion->commerce_id = $commerce->id;
                 $promotion->coupon = $params->coupon;
                 $promotion->max = $params->max;
                 $promotion->expiry = $params->expiry;
@@ -149,9 +148,7 @@ class PromotionController extends Controller
             $commerce = $this->getIdentity($request);
 
             // Buscar el registro a actualizar
-            $promotion = Promotion::where('id', $id)
-                    ->where('commerce_id', $commerce->id)
-                    ->first();
+            $promotion = Promotion::where('id', $id)->first();
 
 
             if(!empty($promotion) && is_object($promotion)){
@@ -188,19 +185,17 @@ class PromotionController extends Controller
         $commerce = $this->getIdentity($request);
 
         //  Conseguir el registro
-        $Promotion = Promotion::where('id', $id)
-                    ->where('commerce_id', $commerce->id)
-                    ->first();
+        $promotion = Promotion::where('id', $id)->first();
         
-        if(!empty($Promotion)){
+        if(!empty($promotion)){
             // Borrarlo
-            $Promotion->delete();
+            $promotion->delete();
 
             // Devolver algo
             $data = [
               'code' => 200,
               'status' => 'success',
-              'Promotion' => $Promotion
+              'Promotion' => $promotion
             ];
         }else{
             $data = [
@@ -279,11 +274,11 @@ class PromotionController extends Controller
     }
 
     public function getPromotionsBycommerce($id){
-        $Promotions = Promotion::where('commerce_id',$id)->get();
+        $promotions = Promotion::where('commerce_id',$id)->get();
         
         return response()->json([
             'status' => 'success',
-            'Promotions' => $Promotions
+            'Promotions' => $promotions
         ], 200);
     }
 }
