@@ -8,7 +8,11 @@ class Commerce extends Model
 {
     public function promotions()
     {
-        return $this->hasMany('App\promotions');
+        return $this->hasMany('App\Promotion');
     }
-    
+
+    public function services()
+    {
+        return $this->hasMany('App\Service');
+    }
 }

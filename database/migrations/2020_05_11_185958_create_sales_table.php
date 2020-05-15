@@ -16,7 +16,6 @@ class CreateSalesTable extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('service_id')->unsigned();
-            $table->bigInteger('favorite_id')->unsigned();
             $table->double('amount');
             $table->double('iva')->nullable();
             $table->timestamps();

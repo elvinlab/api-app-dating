@@ -4,44 +4,45 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Promotion;
+use App\Service;
+use App\Category;
 use App\Helpers\JwtAuth;
 
-class PromotionController extends Controller
+class ServiceController extends Controller
 {
     public function __construct() {
         $this->middleware('api.auth', ['except' => [
             'index',
             'show',
             'getImage',
-            'getPromotionsBycommerce'
+            'getServicesBycommerce'
         ]]);
     }
     
     public function index(){
-        $promotions = Promotion::all()->load('commerce');
+        $services = Service::all()->load('commerce');
         
         return response()->json([
             'code' => 200,
             'status' => 'success',
-            'Promotions' => $promotions
+            'Services' => $services
         ], 200);
     }
     
     public function show($id){
-        $promotion = Promotion::find($id)->load('commerce');
+        $service = Service::find($id)->load('commerce','category' );
         
-        if(is_object($promotion)){
+        if(is_object($service)){
            $data = [
                 'code' => 200,
                 'status' => 'success',
-                'Promotions' => $promotion
+                'Services' => $service
             ];
         }else{
             $data = [
                 'code' => 404,
                 'status' => 'error',
-                'message' => 'La promocion no existe'
+                'message' => 'el servicio no existe'
             ];
         }
         
@@ -49,7 +50,7 @@ class PromotionController extends Controller
     }
     
     public function store(Request $request){
-        // Recoger datos por Promotion
+        // Recoger datos por Service
         $json = $request->input('json', null);
         $params = json_decode($json);
         $params_array = json_decode($json, true);
@@ -76,25 +77,25 @@ class PromotionController extends Controller
                 $data = [
                   'code' => 400,
                   'status' => 'error',
-                  'message' => 'No se ha guardado la promotion, faltan datos',
+                  'message' => 'No se ha guardado la Service, faltan datos',
                   'error' => $validate->errors()
                 ];
             }else{
                 // Guardar el articulo
-                $promotion = new Promotion();
-                $promotion->commerce_id = $params->commerce_id;
-                $promotion->coupon = $params->coupon;
-                $promotion->max = $params->max;
-                $promotion->expiry = $params->expiry;
-                $promotion->description = $params->description;
-                $promotion->image = $params->image;
-                $promotion->discount = $params->discount;
-                $promotion->save();
+                $Service = new Service();
+                $Service->commerce_id = $params->commerce_id;
+                $Service->coupon = $params->coupon;
+                $Service->max = $params->max;
+                $Service->expiry = $params->expiry;
+                $Service->description = $params->description;
+                $Service->image = $params->image;
+                $Service->discount = $params->discount;
+                $Service->save();
                 
                 $data = [
                     'code' => 200,
                     'status' => 'success',
-                    'Promotion' => $promotion
+                    'Service' => $Service
                   ];
             }
             
@@ -111,7 +112,7 @@ class PromotionController extends Controller
     }
     
     public function update($id, Request $request){
-        // Recoger los datos por Promotion
+        // Recoger los datos por Service
         $json = $request->input('json', null);
         $params_array = json_decode($json, true, JSON_UNESCAPED_UNICODE);
 
@@ -149,21 +150,21 @@ class PromotionController extends Controller
             $commerce = $this->getIdentity($request);
 
             // Buscar el registro a actualizar
-            $promotion = Promotion::where('id', $id)
+            $Service = Service::where('id', $id)
                     ->where('commerce_id', $commerce->id)
                     ->first();
 
 
-            if(!empty($promotion) && is_object($promotion)){
+            if(!empty($Service) && is_object($Service)){
                 
                 // Actualizar el registro en concreto
-                $promotion->update($params_array);
+                $Service->update($params_array);
               
                 // Devolver algo
                 $data = array(
                     'code' => 200,
                     'status' => 'success',
-                    'Promotion' => $promotion,
+                    'Service' => $Service,
                     'changes' => $params_array
                 );
             }
@@ -173,7 +174,7 @@ class PromotionController extends Controller
                 'id' => $id,
                 'commerce_id' => $commerce->sub
             ];
-            $Promotion = Promotion::updateOrCreate($where, $params_array);
+            $Service = Service::updateOrCreate($where, $params_array);
              * 
              */
 
@@ -188,25 +189,25 @@ class PromotionController extends Controller
         $commerce = $this->getIdentity($request);
 
         //  Conseguir el registro
-        $Promotion = Promotion::where('id', $id)
+        $Service = Service::where('id', $id)
                     ->where('commerce_id', $commerce->id)
                     ->first();
         
-        if(!empty($Promotion)){
+        if(!empty($Service)){
             // Borrarlo
-            $Promotion->delete();
+            $Service->delete();
 
             // Devolver algo
             $data = [
               'code' => 200,
               'status' => 'success',
-              'Promotion' => $Promotion
+              'Service' => $Service
             ];
         }else{
             $data = [
               'code' => 404,
               'status' => 'error',
-              'message' => 'El Promotion no existe'
+              'message' => 'El Service no existe'
             ]; 
         }
         
@@ -241,10 +242,10 @@ class PromotionController extends Controller
         }else{
             $image_name = time().$image->getClientOriginalName();
             
-            \Storage::disk('promotions')->put($image_name, \File::get($image));
+            \Storage::disk('Services')->put($image_name, \File::get($image));
 
              //Guardamos el nombre de la imagen en la base de datos
-             Promotion::where('id', $id)->update(array('image' => $image_name));
+             Service::where('id', $id)->update(array('image' => $image_name));
             
             $data = [
                 'code' => 200,
@@ -259,11 +260,11 @@ class PromotionController extends Controller
     
     public function getImage($filename){
         // Comprobar si existe el fichero
-        $isset = \Storage::disk('promotions')->exists($filename);
+        $isset = \Storage::disk('Services')->exists($filename);
         
         if($isset){
             // Conseguir la imagen
-            $file = \Storage::disk('promotions')->get($filename);
+            $file = \Storage::disk('Services')->get($filename);
             
             // Devolver la imagen
             return new Response($file, 200);
@@ -278,12 +279,12 @@ class PromotionController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function getPromotionsBycommerce($id){
-        $Promotions = Promotion::where('commerce_id',$id)->get();
+    public function getServicesBycommerce($id){
+        $Services = Service::where('commerce_id',$id)->get();
         
         return response()->json([
             'status' => 'success',
-            'Promotions' => $Promotions
+            'Services' => $Services
         ], 200);
     }
 }
