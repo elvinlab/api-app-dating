@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Commerce extends Model
 {
+
+    public $incrementing = false;
+ 
+    protected $keyType = 'string';
+    
     public function promotions()
     {
         return $this->hasMany('App\Promotion');

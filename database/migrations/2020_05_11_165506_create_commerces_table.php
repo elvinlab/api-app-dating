@@ -14,7 +14,7 @@ class CreateCommercesTable extends Migration
     public function up()
     {
         Schema::create('commerces', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('email')->unique();
             $table->string('password');
             $table->string('name_owner');

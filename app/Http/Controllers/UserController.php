@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\User;
+use Uuid;
 
 class UserController extends Controller
 {
@@ -44,6 +45,7 @@ class UserController extends Controller
 
                 // Crear el usuario
                 $user = new User();
+                $user->id = Uuid::generate()->string;
                 $user->name = $params_array['name'];
                 $user->surname = $params_array['surname'];
                 $user->email = $params_array['email'];

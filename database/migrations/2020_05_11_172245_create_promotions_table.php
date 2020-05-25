@@ -15,7 +15,7 @@ class CreatePromotionsTable extends Migration
     {
         Schema::create('promotions', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('commerce_id')->unsigned();
+            $table->string('commerce_id',36);
             $table->string('coupon')->unique();
             $table->integer('max');
             $table->integer('amount')->nullable();

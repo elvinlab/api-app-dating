@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Commerce;
+use Uuid;
 
 class CommerceController extends Controller
 {
@@ -45,6 +46,7 @@ class CommerceController extends Controller
 
                 // Crear el comercio
                 $commerce = new Commerce();
+                $commerce->id = Uuid::generate()->string;
                 $commerce->email = $params_array['email'];
                 $commerce->password = $pwd;
                 $commerce->name_owner = $params_array['name_owner'];
