@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use App\User;
 
 class UserController extends Controller
 {
-    public function register(Request $request) {
-
+    public function register(Request $request) {        
         // Recorger los datos del usuario por post
         $json = $request->input('json', null);
         $params = json_decode($json); // objeto
@@ -42,23 +42,27 @@ class UserController extends Controller
                 // Cifrar la contraseña
                 $pwd = hash('sha256', $params->password);
 
-                // Crear el usuario
-                $user = new User();
-                $user->name = $params_array['name'];
-                $user->surname = $params_array['surname'];
-                $user->email = $params_array['email'];
-                $user->password = $pwd;
-                $user->role = 'ROLE_USER';
-                $user->	phone = $params_array['phone'];
-                $user->	address = $params_array['address'];
-                // Guardar el usuario
-                $user->save();
+                $params_array['password'] = $pwd;
+                $params_array['role'] = 'ROLE_USER';
+                $params_array['updated_at'] = new \DateTime();
+                $params_array['created_at'] = new \DateTime();
+
+                DB::insert('insert into users (name, surname, email, role, password, phone, address, updated_at, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [$params_array['name'],
+                $params_array['surname'],
+                $params_array['email'],
+                $params_array['role'],
+                $params_array['password'],
+                $params_array['phone'],
+                $params_array['address'],
+                $params_array['updated_at'],
+                $params_array['created_at']]);
 
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
                     'message' => 'El usuario se ha creado correctamente',
-                    'user' => $user
+                    'user' => $params_array
                 );
             }
         } else {
