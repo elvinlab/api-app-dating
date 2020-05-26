@@ -24,25 +24,21 @@ class JwtAuth{
             'password' => $password
          ])->first();
 
-              // Comprobar si son correctas(objeto)
-        $signupAccount = false;
+        // Comprobar si son correctas(objeto)
         if(is_object($account)){
-            $signupAccount = true;
+            $token = array(
+                'id'      =>      $account->id,
+                'email'   =>      $account->email,
+                'name'    =>      $account->name,
+                'surname' =>      $account->surname,
+                'role'    =>      $account->role,
+                'phone'   =>      $account->phone,
+                'address' =>      $account->address,
+                'image'   =>      $account->image,
+                'iat'     =>      time(),
+                'exp'     =>      time() + (30 * 24 * 60 * 60)
+              );
         }
-
-        $token = array(
-            'id'      =>      $account->id,
-            'email'   =>      $account->email,
-            'name'    =>      $account->name,
-            'surname' =>      $account->surname,
-            'role'    =>      $account->role,
-            'phone'   =>      $account->phone,
-            'address' =>      $account->address,
-            'image'   =>      $account->image,
-            'iat'     =>      time(),
-            'exp'     =>      time() + (30 * 24 * 60 * 60)
-          );
-        
         }else if($role == 'ROLE_COMMERCE'){
 
         // Buscar si existe el cliente con sus credenciales
@@ -52,31 +48,27 @@ class JwtAuth{
         ])->first();
 
              // Comprobar si son correctas(objeto)
-             $signupAccount = false;
              if(is_object($account)){
-                 $signupAccount = true;
+                $token = array(
+                    'id'             =>   $account->id,
+                    'email'          =>   $account->email,
+                    'name_owner'     =>   $account->name_owner,
+                    'name_commerce'  =>   $account->name_commerce,
+                    'role'           =>   $account->role,
+                    'cell'           =>   $account->cell,
+                    'tell'           =>   $account->tell,
+                    'recovery_email' =>   $account->recovery_email,
+                    'description'    =>   $account->description,
+                    'address'        =>   $account->address,
+                    'image'          =>   $account->image,
+                    'iat'            =>   time(),
+                    'exp'            =>   time() + (30 * 24 * 60 * 60)
+                  );
              }
-
-             $token = array(
-                'id'             =>   $account->id,
-                'email'          =>   $account->email,
-                'name_owner'     =>   $account->name_owner,
-                'name_commerce'  =>   $account->name_commerce,
-                'role'           =>   $account->role,
-                'cell'           =>   $account->cell,
-                'tell'           =>   $account->tell,
-                'recovery_email' =>   $account->recovery_email,
-                'description'    =>   $account->description,
-                'address'        =>   $account->address,
-                'image'          =>   $account->image,
-                'iat'            =>   time(),
-                'exp'            =>   time() + (30 * 24 * 60 * 60)
-              );
-
         }
 
         // Generar el token con los datos del cliente idenficado
-        if($signupAccount){
+        if(is_object($account)){
             
             $jwt = JWT::encode($token, $this->key, 'HS256');
             $decoded = JWT::decode($jwt, $this->key, ['HS256']);
