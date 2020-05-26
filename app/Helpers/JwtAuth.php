@@ -19,22 +19,31 @@ class JwtAuth{
         if($role == 'ROLE_CLIENT'){
         
          // Buscar si existe el cliente con sus credenciales
+        
+       /*
          $account = Client::where([
             'email' => $email,
             'password' => $password
          ])->first();
+         */
+
+         //Buscando con SQL
+         $results = DB::select('select email, password from clients where email = :email and password = :password', 
+         ["email" => $email, "password"=>$password]);
+
+         $client  = new Client();
 
         // Comprobar si son correctas(objeto)
-        if(is_object($account)){
+        if(count($results) > 0){
             $token = array(
-                'id'      =>      $account->id,
-                'email'   =>      $account->email,
-                'name'    =>      $account->name,
-                'surname' =>      $account->surname,
-                'role'    =>      $account->role,
-                'phone'   =>      $account->phone,
-                'address' =>      $account->address,
-                'image'   =>      $account->image,
+                'id'      =>      $client->id,
+                'email'   =>      $client->email,
+                'name'    =>      $client->name,
+                'surname' =>      $client->surname,
+                'role'    =>      $client->role,
+                'phone'   =>      $client->phone,
+                'address' =>      $client->address,
+                'image'   =>      $client->image,
                 'iat'     =>      time(),
                 'exp'     =>      time() + (30 * 24 * 60 * 60)
               );
@@ -42,26 +51,31 @@ class JwtAuth{
         
         }else if($role == 'ROLE_COMMERCE'){
 
-        // Buscar si existe el cliente con sus credenciales
+        /* Buscar si existe el cliente con sus credenciales
         $account = Commerce::where([
         'email' => $email,
         'password' => $password
         ])->first();
+        */
+          //Buscando con SQL
+          $results = DB::select('select email, password from commerces where email = :email and password = :password', 
+          ["email" => $email, "password"=>$password]);
 
+          $commerce  = new Commerce();
              // Comprobar si son correctas(objeto)
-             if(is_object($account)){
+             if(count($results) > 0){
                 $token = array(
-                    'id'             =>   $account->id,
-                    'email'          =>   $account->email,
-                    'name_owner'     =>   $account->name_owner,
-                    'name_commerce'  =>   $account->name_commerce,
-                    'role'           =>   $account->role,
-                    'cell'           =>   $account->cell,
-                    'tell'           =>   $account->tell,
-                    'recovery_email' =>   $account->recovery_email,
-                    'description'    =>   $account->description,
-                    'address'        =>   $account->address,
-                    'image'          =>   $account->image,
+                    'id'             =>   $commerce->id,
+                    'email'          =>   $commerce->email,
+                    'name_owner'     =>   $commerce->name_owner,
+                    'name_commerce'  =>   $commerce->name_commerce,
+                    'role'           =>   $commerce->role,
+                    'cell'           =>   $commerce->cell,
+                    'tell'           =>   $commerce->tell,
+                    'recovery_email' =>   $commerce->recovery_email,
+                    'description'    =>   $commerce->description,
+                    'address'        =>   $commerce->address,
+                    'image'          =>   $commerce->image,
                     'iat'            =>   time(),
                     'exp'            =>   time() + (30 * 24 * 60 * 60)
                   );
@@ -69,7 +83,7 @@ class JwtAuth{
         }
 
         // Generar el token con los datos del cliente idenficado
-        if(is_object($account)){
+        if(count($results) > 0){
             
             $jwt = JWT::encode($token, $this->key, 'HS256');
             $decoded = JWT::decode($jwt, $this->key, ['HS256']);

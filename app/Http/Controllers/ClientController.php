@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB; // Con esto podemos hacer consultas por sql
 use App\client;
-use Uuid;
+use Uuid; //Generamos ID unico para cada registro
 
 class ClientController extends Controller
 {
@@ -43,7 +43,9 @@ class ClientController extends Controller
                 // Validación pasada correctamente
                 // Cifrar la contraseña
                 $pwd = hash('sha256', $params->password);
+                
 
+                /* DE ESTA MANERA SE GUARDA CON EL ORM
                 // Crear el cliente
                 $client = new Client();
                 $client->id = Uuid::generate()->string;
@@ -56,12 +58,32 @@ class ClientController extends Controller
                 $client->	address = $params_array['address'];
                 // Guardar el cliente
                 $client->save();
+                */
+                //ASI SE GUARDA CON SQL
+
+                $params_array['id'] = Uuid::generate()->string;
+                $params_array['password'] = $pwd;
+                $params_array['role'] = 'ROLE_CLIENT';
+                $params_array['created_at'] = new \DateTime();
+                $params_array['updated_at'] = new \DateTime();
+                
+                DB::insert('insert into clients (id, name, surname, email, password, role, phone, address, created_at, updated_at) values (?,?,?,?,?,?,?,?,?,?)',[
+                    $params_array['id'] ,
+                    $params_array['name'],
+                    $params_array['surname'],
+                    $params_array['email'],
+                    $params_array['password'],
+                    $params_array['role'],
+                    $params_array['phone'],
+                    $params_array['address'],
+                    $params_array['created_at'],
+                    $params_array['updated_at']]);
 
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
-                    'message' => 'El cliente se ha creado correctamente',
-                    'client' => $client
+                    'message' => 'El cliente se ha registrado correctamente',
+                    'client' => $params_array
                 );
             }
         } else {
