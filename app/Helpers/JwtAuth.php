@@ -70,7 +70,7 @@ class JwtAuth{
                 'address'        =>   $account->address,
                 'image'          =>   $account->image,
                 'iat'            =>   time(),
-                'exp'            =>   time() + (7 * 24 * 60 * 60)
+                'exp'            =>   time() + (30 * 24 * 60 * 60)
               );
 
         }
