@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\User;
+use App\client;
 use Uuid;
 
-class UserController extends Controller
+class ClientController extends Controller
 {
     public function register(Request $request) {
 
-        // Recorger los datos del usuario por post
+        // Recorger los datos del cliente por post
         $json = $request->input('json', null);
         $params = json_decode($json); // objeto
         $params_array = json_decode($json, true); // array
@@ -24,7 +24,7 @@ class UserController extends Controller
             // Validar datos
             $validate = \Validator::make($params_array, [
                         'name' => 'required|alpha',
-                        'email' => 'required|email|unique:users',
+                        'email' => 'required|email|unique:clients',
                         'password' => 'required',
                         'address' => 'required',
                         'phone' => 'required'
@@ -35,7 +35,7 @@ class UserController extends Controller
                 $data = array(
                     'status' => 'error',
                     'code' => 404,
-                    'message' => 'El usuario no se ha creado',
+                    'message' => 'El cliente no se ha creado',
                     'errors' => $validate->errors()
                 );
             } else {
@@ -43,24 +43,24 @@ class UserController extends Controller
                 // Cifrar la contraseña
                 $pwd = hash('sha256', $params->password);
 
-                // Crear el usuario
-                $user = new User();
-                $user->id = Uuid::generate()->string;
-                $user->name = $params_array['name'];
-                $user->surname = $params_array['surname'];
-                $user->email = $params_array['email'];
-                $user->password = $pwd;
-                $user->role = 'ROLE_USER';
-                $user->	phone = $params_array['phone'];
-                $user->	address = $params_array['address'];
-                // Guardar el usuario
-                $user->save();
+                // Crear el cliente
+                $client = new Client();
+                $client->id = Uuid::generate()->string;
+                $client->name = $params_array['name'];
+                $client->surname = $params_array['surname'];
+                $client->email = $params_array['email'];
+                $client->password = $pwd;
+                $client->role = 'ROLE_CLIENT';
+                $client->	phone = $params_array['phone'];
+                $client->	address = $params_array['address'];
+                // Guardar el cliente
+                $client->save();
 
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
-                    'message' => 'El usuario se ha creado correctamente',
-                    'user' => $user
+                    'message' => 'El cliente se ha creado correctamente',
+                    'client' => $client
                 );
             }
         } else {
@@ -91,10 +91,10 @@ class UserController extends Controller
 
         if ($validate->fails()) {
             // La validación ha fallado
-            $signupUser = array(
+            $signupclient = array(
                 'status' => 'error',
                 'code' => 404,
-                'message' => 'El usuario no se ha podido identificar',
+                'message' => 'El cliente no se ha podido identificar',
                 'errors' => $validate->errors()
             );
         } else {
@@ -102,19 +102,19 @@ class UserController extends Controller
             $pwd = hash('sha256', $params->password);
 
             // Devolver token o datos
-            $signupUser = $jwtAuth->signupUser($params->email, $pwd);
+            $signupclient = $jwtAuth->signupclient($params->email, $pwd);
 
             if (!empty($params->gettoken)) {
-                $signupUser = $jwtAuth->signupUser($params->email, $pwd, true);
+                $signupclient = $jwtAuth->signupclient($params->email, $pwd, true);
             }
         }
 
-        return response()->json($signupUser, 200);
+        return response()->json($signupclient, 200);
     }
 
     public function update(Request $request) {
 
-        // Comprobar si el usuario está identificado
+        // Comprobar si el cliente está identificado
         $token = $request->header('Authorization');
         $jwtAuth = new \JwtAuth();
         $checkToken = $jwtAuth->checkToken($token);
@@ -125,8 +125,8 @@ class UserController extends Controller
 
         if ($checkToken && !empty($params)) {
 
-            // Sacar usuario identificado
-            $user = $jwtAuth->checkToken($token, true);
+            // Sacar cliente identificado
+            $client = $jwtAuth->checkToken($token, true);
 
                 //en angular validar si se modifica o no la contraseña
                 //$pwd = hash('sha256', $params->password);
@@ -141,21 +141,21 @@ class UserController extends Controller
             unset($params_array['role']);
             unset($params_array['created_at']);
 
-            // Actualizar usuario en bbdd
-            $user_update = User::where('id', $user->id)->update($params_array);
+            // Actualizar cliente en bbdd
+            $client_update = Client::where('id', $client->id)->update($params_array);
 
             // Devolver array con resultado
             $data = array(
                 'code' => 200,
                 'status' => 'success',
-                'user' => $user,
+                'client' => $client,
                 'changes' => $params_array
             );
         } else {
             $data = array(
                 'code' => 400,
                 'status' => 'error',
-                'message' => 'El usuario no está identificado.'
+                'message' => 'El cliente no está identificado.'
             );
         }
 
@@ -168,7 +168,7 @@ class UserController extends Controller
         $token = $request->header('Authorization');
         
         $jwtAuth = new \JwtAuth();        
-        $user_image = $jwtAuth->checkToken($token, true);
+        $client_image = $jwtAuth->checkToken($token, true);
 
         // Validacion de imagen
         $validate = \Validator::make($request->all(), [
@@ -185,10 +185,10 @@ class UserController extends Controller
         } else {
             //Guardamos en local storage la imagen 
             $image_name = time() . $image->getClientOriginalName();
-            \Storage::disk('users')->put($image_name, \File::get($image));
+            \Storage::disk('clients')->put($image_name, \File::get($image));
 
             //Guardamos el nombre de la imagen en la base de datos
-             User::where('id', $user_image->id)->update(array('image' => $image_name));
+             Client::where('id', $client_image->id)->update(array('image' => $image_name));
 
             $data = array(
                 'code' => 200,
@@ -201,9 +201,9 @@ class UserController extends Controller
     }
 
     public function getImage($filename) {
-        $isset = \Storage::disk('users')->exists($filename);
+        $isset = \Storage::disk('clients')->exists($filename);
         if ($isset) {
-            $file = \Storage::disk('users')->get($filename);
+            $file = \Storage::disk('clients')->get($filename);
             return new Response($file, 200);
         } else {
             $data = array(
@@ -217,19 +217,19 @@ class UserController extends Controller
     }
 
     public function detail($id) {
-        $user = User::find($id);
+        $client = Client::find($id);
 
-        if (is_object($user)) {
+        if (is_object($client)) {
             $data = array(
                 'code' => 200,
                 'status' => 'success',
-                'user' => $user
+                'client' => $client
             );
         } else {
              $data = array(
                 'code' => 404,
                 'status' => 'error',
-                'message' => 'El usuario no existe.'
+                'message' => 'El cliente no existe.'
             );
         }
         

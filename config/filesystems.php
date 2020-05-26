@@ -55,9 +55,9 @@ return [
             'visibility' => 'public',
         ],
         
-        'users' => [
+        'clients' => [
             'driver' => 'local',
-            'root' => storage_path('app/users/avatars'),
+            'root' => storage_path('app/clients/avatars'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],

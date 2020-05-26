@@ -3,7 +3,7 @@ namespace App\Helpers;
 
 use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\DB;
-use App\User;
+use App\Client;
 use App\Commerce;
 
 class JwtAuth{
@@ -11,35 +11,35 @@ class JwtAuth{
     public $key;
     
     public function __construct() {
-        $this->key = 'Proyecto_app_dating_Decimoinc_user_commerce_team_Adrian_Elvin_Josesteban_2020';
+        $this->key = 'Proyecto_app_dating_Decimoinc_client_commerce_team_Adrian_Elvin_Josesteban_2020';
     }
     
-    public function signupUser($email, $password, $getToken = null){
-        
+    public function signupClient($role, $email, $password, $getToken = null){
+    
         // Buscar si existe el usuario con sus credenciales
-         $user = User::where([
+         $client = Client::where([
                 'email' => $email,
                 'password' => $password
          ])->first();
     
         // Comprobar si son correctas(objeto)
-        $signupUser = false;
-        if(is_object($user)){
-            $signupUser = true;
+        $signupClient = false;
+        if(is_object($client)){
+            $signupClient = true;
         }
         
         // Generar el token con los datos del usuario idenficado
-        if($signupUser){
+        if($signupClient){
             
             $token = array(
-              'id'      =>      $user->id,
-              'email'   =>      $user->email,
-              'name'    =>      $user->name,
-              'surname' =>      $user->surname,
-              'role'    =>      $user->role,
-              'phone'   =>      $user->phone,
-              'address' =>      $user->address,
-              'image'   =>      $user->image,
+              'id'      =>      $client->id,
+              'email'   =>      $client->email,
+              'name'    =>      $client->name,
+              'surname' =>      $client->surname,
+              'role'    =>      $client->role,
+              'phone'   =>      $client->phone,
+              'address' =>      $client->address,
+              'image'   =>      $client->image,
               'iat'     =>      time(),
               'exp'     =>      time() + (30 * 24 * 60 * 60)
             );

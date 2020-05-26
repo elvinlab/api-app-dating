@@ -15,7 +15,7 @@ class CreateAppointmentsTable extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id',36);
+            $table->string('client_id',36);
             $table->string('commerce_id',36);
             $table->bigInteger('service_id')->unsigned();
             $table->date('schedule_day');
@@ -23,7 +23,7 @@ class CreateAppointmentsTable extends Migration
             $table->string('status');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('client_id')->references('id')->on('clients');
             $table->foreign('commerce_id')->references('id')->on('commerces');
             $table->foreign('service_id')->references('id')->on('services');
         });

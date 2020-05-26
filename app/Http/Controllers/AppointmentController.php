@@ -14,12 +14,12 @@ class AppointmentController extends Controller
             'index',
             'show',
             'getAppointmentsBycommerce',
-            'getAppointmentsByuser'
+            'getAppointmentsByclient'
         ]]);
     }
     
     public function index(){
-        $appointments = Appointment::all()->load('user','commerce', 'service');
+        $appointments = Appointment::all()->load('client','commerce', 'service');
         
         return response()->json([
             'code' => 200,
@@ -29,7 +29,7 @@ class AppointmentController extends Controller
     }
     
     public function show($id){
-        $appointment = Appointment::find($id)->load('user','commerce', 'service');
+        $appointment = Appointment::find($id)->load('client','commerce', 'service');
         
         if(is_object($appointment)){
            $data = [
@@ -58,10 +58,11 @@ class AppointmentController extends Controller
         
         if(!empty($params_array)){
             // Conseguir comercio identificado
-            $user = $this->getIdentity($request);
+            $client = $this->getIdentity($request);
             
             // Validar los datos
             $validate = \Validator::make($params_array, [
+                'client_id'=>'required',
                 'commerce_id'=>'required',
                 'service_id'=>'required',
                 'schedule_day'=>'required',
@@ -78,7 +79,7 @@ class AppointmentController extends Controller
             }else{
                 // Guardar el articulo
                 $Appointment = new Appointment();
-                $Appointment->user_id = $user->id;
+                $Appointment->client_id = $client->id;
                 $Appointment->commerce_id = $params->commerce_id;
                 $Appointment->service_id = $params->service_id;
                 $Appointment->status = 'PENDIENTE';
@@ -133,17 +134,16 @@ class AppointmentController extends Controller
             
             // Eliminar lo que no queremos actualizar
             unset($params_array['id']);
-            unset($params_array['user_id']);
+            unset($params_array['client_id']);
             unset($params_array['status']);
             unset($params_array['created_at']);
             unset($params_array['commerce']);
             
             // Conseguir usuario identificado
-            $user = $this->getIdentity($request);
+            $client = $this->getIdentity($request);
 
             // Buscar el registro a actualizar
             $appointment = Appointment::where('id', $id)->first();
-
 
             if(!empty($appointment) && is_object($appointment)){
                 
@@ -204,11 +204,10 @@ class AppointmentController extends Controller
     private function getIdentity($request){
         $jwtAuth = new JwtAuth();
         $token = $request->header('Authorization', null);
-        $user = $jwtAuth->checkToken($token, true);
+        $client = $jwtAuth->checkToken($token, true);
         
-        return $user;
+        return $client;
     }
-    
     
     public function getAppointmentsBycommerce($id){
         $appointments = Appointment::where('commerce_id',$id)->get();
@@ -219,8 +218,8 @@ class AppointmentController extends Controller
         ], 200);
     }
 
-    public function getAppointmentsByuser($id){
-        $appointments = Appointment::where('user_id',$id)->get();
+    public function getAppointmentsByclient($id){
+        $appointments = Appointment::where('client_id',$id)->get();
         
         return response()->json([
             'status' => 'success',

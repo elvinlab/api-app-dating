@@ -9,11 +9,11 @@ class Appointment extends Model
 {
 
     protected $fillable = [
-        'user_id', 'commerce_id', 'service_id', 'schedule_day', 'schedule_hour', 'status',
+        'client_id', 'commerce_id', 'service_id', 'schedule_day', 'schedule_hour', 'status',
     ];
-    public function user()
+    public function client()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\Client');
     }
 
     public function service()

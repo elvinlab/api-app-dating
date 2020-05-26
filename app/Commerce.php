@@ -10,6 +10,15 @@ class Commerce extends Model
     public $incrementing = false;
  
     protected $keyType = 'string';
+
+       /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password',
+    ];
     
     public function promotions()
     {
