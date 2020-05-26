@@ -15,18 +15,19 @@ class ApiAuthMiddleware
      */
     public function handle($request, Closure $next)
     {
-        // Comprobar si el usuario está identificado
+        // Comprobar si el cliente está identificado
         $token = $request->header('Authorization');
         $jwtAuth = new \JwtAuth();
         $checkToken = $jwtAuth->checkToken($token);
-        
+
         if($checkToken){ 
            return $next($request);  
         }else{
+   
              $data = array(
                 'code' => 400,
                 'status' => 'error',
-                'message' => 'El usuario/commercio no está identificado.'
+                'message' => 'No te encuentras identificado en la app'
             );
             return response()->json($data, $data['code']);
         }

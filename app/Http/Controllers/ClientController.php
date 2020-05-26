@@ -91,7 +91,7 @@ class ClientController extends Controller
 
         if ($validate->fails()) {
             // La validación ha fallado
-            $signupclient = array(
+            $signup = array(
                 'status' => 'error',
                 'code' => 404,
                 'message' => 'El cliente no se ha podido identificar',
@@ -102,14 +102,14 @@ class ClientController extends Controller
             $pwd = hash('sha256', $params->password);
 
             // Devolver token o datos
-            $signupclient = $jwtAuth->signupclient($params->email, $pwd);
+            $signup = $jwtAuth->signup('ROLE_CLIENT', $params->email, $pwd);
 
             if (!empty($params->gettoken)) {
-                $signupclient = $jwtAuth->signupclient($params->email, $pwd, true);
+                $signup= $jwtAuth->signup('ROLE_CLIENT', $params->email, $pwd, true);
             }
         }
 
-        return response()->json($signupclient, 200);
+        return response()->json($signup, 200);
     }
 
     public function update(Request $request) {

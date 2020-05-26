@@ -96,7 +96,7 @@ class CommerceController extends Controller
 
         if ($validate->fails()) {
             // La validación ha fallado
-            $signupcommerce = array(
+            $signup = array(
                 'status' => 'error',
                 'code' => 404,
                 'message' => 'El comercio no se ha podido identificar',
@@ -107,14 +107,14 @@ class CommerceController extends Controller
             $pwd = hash('sha256', $params->password);
 
             // Devolver token o datos
-            $signupcommerce = $jwtAuth->signupcommerce($params->email, $pwd);
+            $signup = $jwtAuth->signup('ROLE_COMMERCE', $params->email, $pwd);
 
             if (!empty($params->gettoken)) {
-                $signupcommerce = $jwtAuth->signupcommerce($params->email, $pwd, true);
+                $signup = $jwtAuth->signup('ROLE_COMMERCE', $params->email, $pwd, true);
             }
         }
 
-        return response()->json($signupcommerce, 200);
+        return response()->json($signup, 200);
     }   
 
     public function update(Request $request) {
