@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB; // Con esto podemos hacer consultas por sql
 use App\client;
 use Uuid;
 
