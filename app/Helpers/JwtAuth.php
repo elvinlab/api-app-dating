@@ -39,6 +39,7 @@ class JwtAuth{
                 'exp'     =>      time() + (30 * 24 * 60 * 60)
               );
         }
+        
         }else if($role == 'ROLE_COMMERCE'){
 
         // Buscar si existe el cliente con sus credenciales
