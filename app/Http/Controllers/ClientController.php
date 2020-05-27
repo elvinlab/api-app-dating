@@ -159,13 +159,23 @@ class ClientController extends Controller
             // Quitar los campos que no quiero actualizar
             unset($params_array['id']);
             unset($params_array['password']);
-            unset($params_array['name']);
             unset($params_array['email']);
             unset($params_array['role']);
             unset($params_array['created_at']);
 
-            // Actualizar cliente en bbdd
+            /* Actualizar cliente en bbdd
             $client_update = Client::where('id', $client->id)->update($params_array);
+            */
+            $params_array['id'] = $client->id;
+            $params_array['updated_at'] = new \DateTime();
+
+            DB::update('update clients set name = ?, surname = ?, phone = ?, address = ?, updated_at = ? where id = ?',[
+                $params_array['name'],
+                $params_array['surname'],
+                $params_array['phone'],
+                $params_array['address'],
+                $params_array['updated_at'],
+                $params_array['id']]);
 
             // Devolver array con resultado
             $data = array(
@@ -211,7 +221,7 @@ class ClientController extends Controller
             \Storage::disk('clients')->put($image_name, \File::get($image));
 
             //Guardamos el nombre de la imagen en la base de datos
-             Client::where('id', $client_image->id)->update(array('image' => $image_name));
+            DB::update('update clients set image = ? where id = ?',[$image_name, $client_image->id]);
 
             $data = array(
                 'code' => 200,
@@ -240,9 +250,11 @@ class ClientController extends Controller
     }
 
     public function detail($id) {
-        $client = Client::find($id);
+    
+        $client = DB::select('select * from clients where id = ?', [$id]);
 
-        if (is_object($client)) {
+
+        if (count($client) > 0) {
             $data = array(
                 'code' => 200,
                 'status' => 'success',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB; // Con esto podemos hacer consultas por sql
 use App\Commerce;
 use Uuid;
 
@@ -44,7 +45,7 @@ class CommerceController extends Controller
                 // Cifrar la contraseña
                 $pwd = hash('sha256', $params->password);
 
-                // Crear el comercio
+                /* Crear el comercio
                 $commerce = new Commerce();
                 $commerce->id = Uuid::generate()->string;
                 $commerce->email = $params_array['email'];
@@ -59,12 +60,35 @@ class CommerceController extends Controller
                 $commerce->	address = $params_array['address'];
                 // Guardar el comercio
                 $commerce->save();
+                */
+
+                $params_array['id'] = Uuid::generate()->string;
+                $params_array['password'] = $pwd;
+                $params_array['role'] = 'ROLE_COMMERCE';
+                $params_array['created_at'] = new \DateTime();
+                $params_array['updated_at'] = new \DateTime();
+
+                 //ASI SE GUARDA CON SQL
+                 DB::insert('insert into commerces (id, email, password, name_owner, name_commerce, role, cell, tell, recovery_email, description, address, created_at, updated_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?)',[
+                    $params_array['id'] ,
+                    $params_array['email'],
+                    $params_array['password'],
+                    $params_array['name_owner'],
+                    $params_array['name_commerce'],
+                    $params_array['role'],
+                    $params_array['cell'],
+                    $params_array['tell'],
+                    $params_array['recovery_email'],
+                    $params_array['description'],
+                    $params_array['address'],
+                    $params_array['created_at'],
+                    $params_array['updated_at']]);
 
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
                     'message' => 'El comercio se ha creado correctamente',
-                    'commerce' => $commerce
+                    'commerce' => $params_array
                 );
             }
         } else {
@@ -77,7 +101,6 @@ class CommerceController extends Controller
 
         return response()->json($data, $data['code']);
     }
-
 
     public function login(Request $request) {
 
@@ -124,7 +147,7 @@ class CommerceController extends Controller
         $jwtAuth = new \JwtAuth();
         
         $checkToken = $jwtAuth->checkToken($token);
-        
+
         // Recoger los datos por post
         $json = $request->input('json', null);
         $params_array = json_decode($json, true);
@@ -142,11 +165,24 @@ class CommerceController extends Controller
 
             // Quitar los campos que no quiero actualizar
             unset($params_array['id']);
+            unset($params_array['password']);
+            unset($params_array['name_owner']);
+            unset($params_array['email']);
             unset($params_array['role']);
             unset($params_array['created_at']);
 
-            // Actualizar comercio en bbdd
-            $commerce_update = Commerce::where('id', $commerce->id)->update($params_array);
+            $params_array['id'] = $commerce->id;
+            $params_array['updated_at'] = new \DateTime();
+
+            DB::update('update commerces set  name_commerce = ?, cell = ?, tell = ?, recovery_email = ?, description = ?, address = ?,  updated_at= ? where id = ?',[
+                $params_array['name_commerce'],
+                $params_array['cell'],
+                $params_array['tell'],
+                $params_array['recovery_email'],
+                $params_array['description'],
+                $params_array['address'],
+                $params_array['updated_at'],
+                $params_array['id']]);
 
             // Devolver array con resultado
             $data = array(
@@ -191,8 +227,8 @@ class CommerceController extends Controller
             $image_name = time() . $image->getClientOriginalName();
             \Storage::disk('commerces')->put($image_name, \File::get($image));
 
-            //Guardamos el nombre de la imagen en la base de datos
-             commerce::where('id', $commerce_image->id)->update(array('image' => $image_name));
+             //Guardamos el nombre de la imagen en la base de datos
+            DB::update('update commerces set image = ? where id = ?',[$image_name, $client_image->id]);
 
             $data = array(
                 'code' => 200,
@@ -221,9 +257,9 @@ class CommerceController extends Controller
     }
 
     public function detail($id) {
-        $commerce = Commerce::find($id);
+        $commerce = DB::select('select * from commerces where id = ?', [$id]);
 
-        if (is_object($commerce)) {
+        if (count($commerce) > 0) {
             $data = array(
                 'code' => 200,
                 'status' => 'success',
