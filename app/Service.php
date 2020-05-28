@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 namespace App;
 
@@ -10,14 +10,17 @@ class Service extends Model
         'commerce_id', 'category_id', 'name', 'description', 'price',
     ];
 
-    public function category(){// Muchos Servicios estaran en una categoria
+    public function category()
+    {// Muchos Servicios estaran en una categoria
         return $this->belongsTo('App\Category');//Category es foranea en services
     }
-    public function sales(){//Un servicio puede tener muchas ventas
+    public function sales()
+    {//Un servicio puede tener muchas ventas
         return $this->hasMany('App/Sale');
     }
 
-    public function commerce(){//Muchos Servicios estaran en un comercio
+    public function commerce()
+    {//Muchos Servicios estaran en un comercio
         return $this->belongsTo('App/Commerce');
     }
 

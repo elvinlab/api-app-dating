@@ -8,10 +8,10 @@ class Commerce extends Model
 {
 
     public $incrementing = false;
- 
+
     protected $keyType = 'string';
 
-       /**
+    /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
@@ -19,7 +19,7 @@ class Commerce extends Model
     protected $hidden = [
         'password',
     ];
-    
+
     public function promotions()
     {
         return $this->hasMany('App\Promotion');

@@ -12,8 +12,9 @@ class Promotion extends Model
     ];
 
     protected $table = 'promotions';
-    
-    public function commerce(){
+
+    public function commerce()
+    {
         return $this->belongsTo('App\Commerce');
     }
 }

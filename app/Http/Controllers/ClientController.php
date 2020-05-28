@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB; // Con esto podemos hacer consultas por sql
-use App\client;
 use Uuid; //Generamos ID unico para cada registro
 
 class ClientController extends Controller
 {
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
 
         // Recorger los datos del cliente por post
         $json = $request->input('json', null);
@@ -24,11 +24,11 @@ class ClientController extends Controller
 
             // Validar datos
             $validate = \Validator::make($params_array, [
-                        'name' => 'required|alpha',
-                        'email' => 'required|email|unique:clients',
-                        'password' => 'required',
-                        'address' => 'required',
-                        'phone' => 'required'
+                'name' => 'required|alpha',
+                'email' => 'required|email|unique:clients',
+                'password' => 'required',
+                'address' => 'required',
+                'phone' => 'required'
             ]);
 
             if ($validate->fails()) {
@@ -43,7 +43,7 @@ class ClientController extends Controller
                 // Validación pasada correctamente
                 // Cifrar la contraseña
                 $pwd = hash('sha256', $params->password);
-                
+
 
                 /* DE ESTA MANERA SE GUARDA CON EL ORM
                 // Crear el cliente
@@ -66,9 +66,9 @@ class ClientController extends Controller
                 $params_array['role'] = 'ROLE_CLIENT';
                 $params_array['created_at'] = new \DateTime();
                 $params_array['updated_at'] = new \DateTime();
-                
-                DB::insert('insert into clients (id, name, surname, email, password, role, phone, address, created_at, updated_at) values (?,?,?,?,?,?,?,?,?,?)',[
-                    $params_array['id'] ,
+
+                DB::insert('insert into clients (id, name, surname, email, password, role, phone, address, created_at, updated_at) values (?,?,?,?,?,?,?,?,?,?)', [
+                    $params_array['id'],
                     $params_array['name'],
                     $params_array['surname'],
                     $params_array['email'],
@@ -77,7 +77,8 @@ class ClientController extends Controller
                     $params_array['phone'],
                     $params_array['address'],
                     $params_array['created_at'],
-                    $params_array['updated_at']]);
+                    $params_array['updated_at']
+                ]);
 
                 $data = array(
                     'status' => 'success',
@@ -96,8 +97,9 @@ class ClientController extends Controller
 
         return response()->json($data, $data['code']);
     }
-    
-    public function login(Request $request) {
+
+    public function login(Request $request)
+    {
 
         $jwtAuth = new \JwtAuth();
 
@@ -128,20 +130,21 @@ class ClientController extends Controller
             $signup = $jwtAuth->signup('ROLE_CLIENT', $params->email, $pwd);
 
             if (!empty($params->gettoken)) {
-                $signup= $jwtAuth->signup('ROLE_CLIENT', $params->email, $pwd, true);
+                $signup = $jwtAuth->signup('ROLE_CLIENT', $params->email, $pwd, true);
             }
         }
 
         return response()->json($signup, 200);
     }
 
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
 
         // Comprobar si el cliente está identificado
         $token = $request->header('Authorization');
         $jwtAuth = new \JwtAuth();
         $checkToken = $jwtAuth->checkToken($token);
-        
+
         // Recoger los datos por post
         $json = $request->input('json', null);
         $params =  json_decode($json);
@@ -150,8 +153,8 @@ class ClientController extends Controller
 
             // Sacar cliente identificado
             $client = $jwtAuth->checkToken($token, true);
-            
-            $params_array =  (array)$params;
+
+            $params_array =  (array) $params;
             // Validar datos
             $validate = \Validator::make($params_array, [
                 'name' => 'required|alpha',
@@ -161,10 +164,10 @@ class ClientController extends Controller
                 'phone' => 'required'
             ]);
 
-                //en angular validar si se modifica o no la contraseña
-                //$pwd = hash('sha256', $params->password);
-                //$params->password = $pwd;
-            
+            //en angular validar si se modifica o no la contraseña
+            //$pwd = hash('sha256', $params->password);
+            //$params->password = $pwd;
+
             // Quitar los campos que no quiero actualizar
             unset($params_array['id']);
             unset($params_array['password']);
@@ -178,13 +181,14 @@ class ClientController extends Controller
             $params_array['id'] = $client->id;
             $params_array['updated_at'] = new \DateTime();
 
-            DB::update('update clients set name = ?, surname = ?, phone = ?, address = ?, updated_at = ? where id = ?',[
+            DB::update('update clients set name = ?, surname = ?, phone = ?, address = ?, updated_at = ? where id = ?', [
                 $params_array['name'],
                 $params_array['surname'],
                 $params_array['phone'],
                 $params_array['address'],
                 $params_array['updated_at'],
-                $params_array['id']]);
+                $params_array['id']
+            ]);
 
             // Devolver array con resultado
             $data = array(
@@ -204,17 +208,18 @@ class ClientController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function upload(Request $request) {
+    public function upload(Request $request)
+    {
         // Recoger datos de la petición
         $image = $request->file('file0');
         $token = $request->header('Authorization');
-        
-        $jwtAuth = new \JwtAuth();        
+
+        $jwtAuth = new \JwtAuth();
         $client_image = $jwtAuth->checkToken($token, true);
 
         // Validacion de imagen
         $validate = \Validator::make($request->all(), [
-                    'file0' => 'required|image|mimes:jpg,jpeg,png,gif'
+            'file0' => 'required|image|mimes:jpg,jpeg,png,gif'
         ]);
 
         // Guardar imagen
@@ -225,12 +230,12 @@ class ClientController extends Controller
                 'message' => 'Error al subir imagen'
             );
         } else {
-            //Guardamos en local storage la imagen 
+            //Guardamos en local storage la imagen
             $image_name = time() . $image->getClientOriginalName();
             \Storage::disk('clients')->put($image_name, \File::get($image));
 
             //Guardamos el nombre de la imagen en la base de datos
-            DB::update('update clients set image = ? where id = ?',[$image_name, $client_image->id]);
+            DB::update('update clients set image = ? where id = ?', [$image_name, $client_image->id]);
 
             $data = array(
                 'code' => 200,
@@ -242,7 +247,8 @@ class ClientController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function getImage($filename) {
+    public function getImage($filename)
+    {
         $isset = \Storage::disk('clients')->exists($filename);
         if ($isset) {
             $file = \Storage::disk('clients')->get($filename);
@@ -258,8 +264,9 @@ class ClientController extends Controller
         }
     }
 
-    public function detail($id) {
-    
+    public function detail($id)
+    {
+
         $client = DB::select('select * from clients where id = ?', [$id]);
 
 
@@ -270,13 +277,13 @@ class ClientController extends Controller
                 'client' => $client
             );
         } else {
-             $data = array(
+            $data = array(
                 'code' => 404,
                 'status' => 'error',
                 'message' => 'El cliente no existe.'
             );
         }
-        
+
         return response()->json($data, $data['code']);
     }
 }

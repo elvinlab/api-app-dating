@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB; // Con esto podemos hacer consultas por sql
-use App\Commerce;
 use Uuid;
 
 class CommerceController extends Controller
 {
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
 
         // Recorger los datos del comercio por post
         $json = $request->input('json', null);
@@ -24,12 +24,12 @@ class CommerceController extends Controller
 
             // Validar datos
             $validate = \Validator::make($params_array, [
-                        'email' => 'required|email|unique:commerces',
-                        'password' => 'required',
-                        'name_owner' => 'required',
-                        'name_commerce' => 'required',
-                        'tell' => 'required',
-                        'address' => 'required',
+                'email' => 'required|email|unique:commerces',
+                'password' => 'required',
+                'name_owner' => 'required',
+                'name_commerce' => 'required',
+                'tell' => 'required',
+                'address' => 'required',
             ]);
 
             if ($validate->fails()) {
@@ -68,9 +68,9 @@ class CommerceController extends Controller
                 $params_array['created_at'] = new \DateTime();
                 $params_array['updated_at'] = new \DateTime();
 
-                 //ASI SE GUARDA CON SQL
-                 DB::insert('insert into commerces (id, email, password, name_owner, name_commerce, role, cell, tell, recovery_email, description, address, created_at, updated_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?)',[
-                    $params_array['id'] ,
+                //ASI SE GUARDA CON SQL
+                DB::insert('insert into commerces (id, email, password, name_owner, name_commerce, role, cell, tell, recovery_email, description, address, created_at, updated_at) values (?,?,?,?,?,?,?,?,?,?,?,?,?)', [
+                    $params_array['id'],
                     $params_array['email'],
                     $params_array['password'],
                     $params_array['name_owner'],
@@ -82,7 +82,8 @@ class CommerceController extends Controller
                     $params_array['description'],
                     $params_array['address'],
                     $params_array['created_at'],
-                    $params_array['updated_at']]);
+                    $params_array['updated_at']
+                ]);
 
                 $data = array(
                     'status' => 'success',
@@ -102,7 +103,8 @@ class CommerceController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
 
         $jwtAuth = new \JwtAuth();
 
@@ -113,8 +115,8 @@ class CommerceController extends Controller
 
         // Validar esos datos
         $validate = \Validator::make($params_array, [
-                    'email' => 'required|email',
-                    'password' => 'required'
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
 
         if ($validate->fails()) {
@@ -138,14 +140,15 @@ class CommerceController extends Controller
         }
 
         return response()->json($signup, 200);
-    }   
+    }
 
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
 
         // Comprobar si el comercio está identificado
         $token = $request->header('Authorization');
         $jwtAuth = new \JwtAuth();
-        
+
         $checkToken = $jwtAuth->checkToken($token);
 
         // Recoger los datos por post
@@ -159,7 +162,7 @@ class CommerceController extends Controller
 
             // Validar datos
             $validate = \Validator::make($params_array, [
-                'email' => 'required|email|unique:commerces'. $commerce->id,
+                'email' => 'required|email|unique:commerces' . $commerce->id,
                 'password' => 'required',
                 'name_owner' => 'required',
                 'name_commerce' => 'required',
@@ -178,7 +181,7 @@ class CommerceController extends Controller
             $params_array['id'] = $commerce->id;
             $params_array['updated_at'] = new \DateTime();
 
-            DB::update('update commerces set  name_commerce = ?, cell = ?, tell = ?, recovery_email = ?, description = ?, address = ?,  updated_at= ? where id = ?',[
+            DB::update('update commerces set  name_commerce = ?, cell = ?, tell = ?, recovery_email = ?, description = ?, address = ?,  updated_at= ? where id = ?', [
                 $params_array['name_commerce'],
                 $params_array['cell'],
                 $params_array['tell'],
@@ -186,7 +189,8 @@ class CommerceController extends Controller
                 $params_array['description'],
                 $params_array['address'],
                 $params_array['updated_at'],
-                $params_array['id']]);
+                $params_array['id']
+            ]);
 
             // Devolver array con resultado
             $data = array(
@@ -206,17 +210,18 @@ class CommerceController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function upload(Request $request) {
+    public function upload(Request $request)
+    {
         // Recoger datos de la petición
         $image = $request->file('file0');
         $token = $request->header('Authorization');
-        
-        $jwtAuth = new \JwtAuth();        
+
+        $jwtAuth = new \JwtAuth();
         $commerce_image = $jwtAuth->checkToken($token, true);
 
         // Validacion de imagen
         $validate = \Validator::make($request->all(), [
-                    'file0' => 'required|image|mimes:jpg,jpeg,png,gif'
+            'file0' => 'required|image|mimes:jpg,jpeg,png,gif'
         ]);
 
         // Guardar imagen
@@ -227,12 +232,12 @@ class CommerceController extends Controller
                 'message' => 'Error al subir imagen'
             );
         } else {
-            //Guardamos en local storage la imagen 
+            //Guardamos en local storage la imagen
             $image_name = time() . $image->getClientOriginalName();
             \Storage::disk('commerces')->put($image_name, \File::get($image));
 
-             //Guardamos el nombre de la imagen en la base de datos
-            DB::update('update commerces set image = ? where id = ?',[$image_name, $client_image->id]);
+            //Guardamos el nombre de la imagen en la base de datos
+            DB::update('update commerces set image = ? where id = ?', [$image_name, $client_image->id]);
 
             $data = array(
                 'code' => 200,
@@ -244,7 +249,8 @@ class CommerceController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function getImage($filename) {
+    public function getImage($filename)
+    {
         $isset = \Storage::disk('commerces')->exists($filename);
         if ($isset) {
             $file = \Storage::disk('commerces')->get($filename);
@@ -260,7 +266,8 @@ class CommerceController extends Controller
         }
     }
 
-    public function detail($id) {
+    public function detail($id)
+    {
         $commerce = DB::select('select * from commerces where id = ?', [$id]);
 
         if (count($commerce) > 0) {
@@ -270,13 +277,13 @@ class CommerceController extends Controller
                 'commerce' => $commerce
             );
         } else {
-             $data = array(
+            $data = array(
                 'code' => 404,
                 'status' => 'error',
                 'message' => 'El comercio no existe.'
             );
         }
-        
+
         return response()->json($data, $data['code']);
     }
 }
