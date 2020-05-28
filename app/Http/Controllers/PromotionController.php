@@ -4,23 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB; // Con esto podemos hacer consultas por sql
 use App\Promotion;
 use App\Helpers\JwtAuth;
 
 class PromotionController extends Controller
 {
     public function __construct() {
-        $this->middleware('api.auth', ['except' => [
-            'index',
-            'show',
-            'getImage',
-            'getPromotionsBycommerce'
-        ]]);
+        $this->middleware('api.auth');
     }
     
     public function index(){
-        $promotions = Promotion::all()->load('commerce');
-        
+        $promotions = DB::select(
+            'select * from promotions
+            INNER JOIN commerces ON commerces.id = promotions.commerce_id');
+
         return response()->json([
             'code' => 200,
             'status' => 'success',
@@ -29,13 +27,16 @@ class PromotionController extends Controller
     }
     
     public function show($id){
-        $promotion = Promotion::find($id)->load('commerce');
+        $promotion = DB::select('select * from promotions where id = ?', [$id]);
         
-        if(is_object($promotion)){
+        if(count($promotion) > 0){
+
+            $commerce = DB::select('select * from commerces where id = ?', [$promotion[0]->commerce_id]);
            $data = [
                 'code' => 200,
                 'status' => 'success',
-                'Promotions' => $promotion
+                'Promotions' => $promotion,
+                'Commerce' => $commerce,
             ];
         }else{
             $data = [
@@ -62,13 +63,12 @@ class PromotionController extends Controller
             
             // Validar los datos
             $validate = \Validator::make($params_array, [
-                'coupon'=>'required',
+                'coupon'=>'required|unique:promotions',
                 'max'=>'required',
                 'expiry'=>'required',
                 'description'=>'required',
                 'discount'=>'required',
                 'image'=>'required',
-
             ]);
             
             if($validate->fails()){
@@ -79,7 +79,7 @@ class PromotionController extends Controller
                   'error' => $validate->errors()
                 ];
             }else{
-                // Guardar el articulo
+                /*Guardar el promocion
                 $promotion = new Promotion();
                 $promotion->commerce_id = $commerce->id;
                 $promotion->coupon = $params->coupon;
@@ -89,11 +89,26 @@ class PromotionController extends Controller
                 $promotion->image = $params->image;
                 $promotion->discount = $params->discount;
                 $promotion->save();
+                */
+                $params_array['commerce_id'] = $commerce->id;
+                $params_array['created_at'] = new \DateTime();
+                $params_array['updated_at'] = new \DateTime();
+
+                DB::insert('insert into promotions (commerce_id, coupon, max, amount, expiry, description, discount, created_at, updated_at) values (?,?,?,?,?,?,?,?,?)',[
+                    $params_array['commerce_id'],
+                    $params_array['coupon'],
+                    $params_array['max'],
+                    $params_array['amount'],
+                    $params_array['expiry'],
+                    $params_array['description'],
+                    $params_array['discount'],
+                    $params_array['created_at'],
+                    $params_array['updated_at']]);
                 
                 $data = [
                     'code' => 200,
                     'status' => 'success',
-                    'Promotion' => $promotion
+                    'Promotion' => $params_array
                   ];
             }
             
@@ -125,7 +140,6 @@ class PromotionController extends Controller
             // Validar datos
             $validate = \Validator::make($params_array, [
                 'commerce_id'=>'required',
-                'coupon'=>'required',
                 'max'=>'required',
                 'expiry'=>'required',
                 'description'=>'required',
@@ -142,20 +156,35 @@ class PromotionController extends Controller
             unset($params_array['id']);
             unset($params_array['commerce_id']);
             unset($params_array['created_at']);
-            unset($params_array['commerce']);
             
             // Conseguir usuario identificado
             $commerce = $this->getIdentity($request);
 
-            // Buscar el registro a actualizar
+            /* Buscar el registro a actualizar
             $promotion = Promotion::where('id', $id)->first();
+            */
+            //Buscar el registro a actualizar
+            $promotion = DB::select('select * from promotions where id = ?', [$id]);
+            
 
-
-            if(!empty($promotion) && is_object($promotion)){
+            if((count($promotion) > 0)){
                 
-                // Actualizar el registro en concreto
+                /* Actualizar el registro en concreto
                 $promotion->update($params_array);
-              
+              */
+
+              $params_array['id'] = $id;
+              $params_array['updated_at'] = new \DateTime();
+  
+              DB::update('update promotions set max = ?, amount = ?, expiry = ?, description = ?, discount = ?,  updated_at = ? where id = ?',[
+                  $params_array['max'],
+                  $params_array['amount'],
+                  $params_array['expiry'],
+                  $params_array['description'],
+                  $params_array['discount'],
+                  $params_array['updated_at'],
+                  $params_array['id']]);
+                  
                 // Devolver algo
                 $data = array(
                     'code' => 200,
@@ -173,23 +202,24 @@ class PromotionController extends Controller
             $Promotion = Promotion::updateOrCreate($where, $params_array);
              * 
              */
-
-            
         }
         
         return response()->json($data, $data['code']);
     }
     
     public function destroy($id, Request $request){
-        // Conseguir usuario identificado
-        $commerce = $this->getIdentity($request);
-
-        //  Conseguir el registro
+        /* Conseguir el registro
         $promotion = Promotion::where('id', $id)->first();
-        
-        if(!empty($promotion)){
-            // Borrarlo
+        */
+
+        $promotion = DB::select('select * from promotions where id = ?', [$id]);
+
+        if(count($promotion) > 0){
+            /*Borrarlo
             $promotion->delete();
+            */
+
+            DB::delete('delete from promotions where id=?', [$id]);
 
             // Devolver algo
             $data = [
@@ -208,19 +238,11 @@ class PromotionController extends Controller
         return response()->json($data, $data['code']);
     }
     
-    private function getIdentity($request){
-        $jwtAuth = new JwtAuth();
-        $token = $request->header('Authorization', null);
-        $commerce = $jwtAuth->checkToken($token, true);
-        
-        return $commerce;
-    }
-    
     public function upload($id, Request $request){
         // Recoger la imagen de la petición
 
         $image = $request->file('file0');
-               
+        
         // Validar imagen
         $validate = \Validator::make($request->all(), [
            'file0' => 'required|image|mimes:jpg,jpeg,png,gif' 
@@ -238,9 +260,13 @@ class PromotionController extends Controller
             
             \Storage::disk('promotions')->put($image_name, \File::get($image));
 
-             //Guardamos el nombre de la imagen en la base de datos
+             /*Guardamos el nombre de la imagen en la base de datos
              Promotion::where('id', $id)->update(array('image' => $image_name));
-            
+            */
+
+             //Guardamos el nombre de la imagen en la base de datos
+             DB::update('update promotions set image = ? where id = ?',[$image_name, $id]);
+
             $data = [
                 'code' => 200,
                 'status' => 'success',
@@ -273,12 +299,20 @@ class PromotionController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function getPromotionsBycommerce($id){
-        $promotions = Promotion::where('commerce_id',$id)->get();
+    public function getPromotionsByCommerce($id){
+        $services = DB::select('select * from promotions where commerce_id = ?', [$id]);
         
         return response()->json([
             'status' => 'success',
-            'Promotions' => $promotions
+            'Services' => $services
         ], 200);
+    }
+    
+    private function getIdentity($request){
+        $jwtAuth = new JwtAuth();
+        $token = $request->header('Authorization', null);
+        $commerce = $jwtAuth->checkToken($token, true);
+        
+        return $commerce;
     }
 }

@@ -4,38 +4,29 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB; // Con esto podemos hacer consultas por sql
 use App\Appointment;
 use App\Helpers\JwtAuth;
 
 class AppointmentController extends Controller
 {
     public function __construct() {
-        $this->middleware('api.auth', ['except' => [
-            'index',
-            'show',
-            'getAppointmentsBycommerce',
-            'getAppointmentsByclient'
-        ]]);
+        $this->middleware('api.auth');
     }
-    
-    public function index(){
-        $appointments = Appointment::all()->load('client','commerce', 'service');
-        
-        return response()->json([
-            'code' => 200,
-            'status' => 'success',
-            'Appointments' => $appointments
-        ], 200);
-    }
-    
-    public function show($id){
-        $appointment = Appointment::find($id)->load('client','commerce', 'service');
-        
-        if(is_object($appointment)){
+
+    public function show($id){   
+        $appointment = DB::select('select * from appointments where id = ?', [$id]);
+
+        if(count($appointment) > 0){
+        $service = DB::select('select * from services where id = ?', [$appointment[0]->service_id]);
+        $commerce = DB::select('select * from commerces where id = ?', [$appointment[0]->commerce_id]);
+
            $data = [
                 'code' => 200,
                 'status' => 'success',
-                'Appointments' => $appointment
+                'Appointments' => $appointment,
+                'Service' => $service,
+                'Commerce' => $commerce,
             ];
         }else{
             $data = [
@@ -62,7 +53,6 @@ class AppointmentController extends Controller
             
             // Validar los datos
             $validate = \Validator::make($params_array, [
-                'client_id'=>'required',
                 'commerce_id'=>'required',
                 'service_id'=>'required',
                 'schedule_day'=>'required',
@@ -77,7 +67,7 @@ class AppointmentController extends Controller
                   'error' => $validate->errors()
                 ];
             }else{
-                // Guardar el articulo
+                /* Guardar el articulo
                 $Appointment = new Appointment();
                 $Appointment->client_id = $client->id;
                 $Appointment->commerce_id = $params->commerce_id;
@@ -86,11 +76,26 @@ class AppointmentController extends Controller
                 $Appointment->schedule_day = $params->schedule_day;
                 $Appointment->schedule_hour = $params->schedule_hour;
                 $Appointment->save();
-                
+                */
+
+                $params_array['client_id'] = $client->id;
+                $params_array['status'] = 'PENDIENTE';
+                $params_array['created_at'] = new \DateTime();
+                $params_array['updated_at'] = new \DateTime();
+
+                DB::insert('insert into appointments (client_id, commerce_id, service_id, schedule_day, schedule_hour, status, created_at, updated_at) values (?,?,?,?,?,?,?,?)',[
+                    $params_array['client_id'],
+                    $params_array['commerce_id'],
+                    $params_array['service_id'],
+                    $params_array['schedule_day'],
+                    $params_array['schedule_hour'],
+                    $params_array['status'],
+                    $params_array['created_at'],
+                    $params_array['updated_at']]);
                 $data = [
                     'code' => 200,
                     'status' => 'success',
-                    'Appointment' => $Appointment
+                    'Appointment' => $params_array
                   ];
             }
             
@@ -137,18 +142,29 @@ class AppointmentController extends Controller
             unset($params_array['client_id']);
             unset($params_array['status']);
             unset($params_array['created_at']);
-            unset($params_array['commerce']);
             
             // Conseguir usuario identificado
             $client = $this->getIdentity($request);
 
-            // Buscar el registro a actualizar
+            /*Buscar el registro a actualizar
             $appointment = Appointment::where('id', $id)->first();
-
-            if(!empty($appointment) && is_object($appointment)){
+            */
+            $appointment = DB::select('select * from appointments where id = ?', [$id]);
+            $service = DB::select('select * from services where id = ?', [$params_array['service_id']]);
+            $commerce = DB::select('select * from commerces where id = ?', [$params_array['commerce_id']]);
+           
+            if((count($appointment) > 0) && (count($service) > 0) && (count($commerce) > 0)){
                 
-                // Actualizar el registro en concreto
-                $appointment->update($params_array);
+            $params_array['id'] = $id;
+            $params_array['updated_at'] = new \DateTime();
+            
+            DB::update('update appointments set  commerce_id = ?, service_id = ?, schedule_day = ?, schedule_hour = ?, updated_at = ? where id = ?',[
+            $params_array['commerce_id'],
+            $params_array['service_id'],
+            $params_array['schedule_day'],
+            $params_array['schedule_hour'],
+            $params_array['updated_at'],
+            $params_array['id']]);
               
                 // Devolver algo
                 $data = array(
@@ -177,12 +193,16 @@ class AppointmentController extends Controller
         // Conseguir usuario identificado
         $commerce = $this->getIdentity($request);
 
-        //  Conseguir el registro
+        /*  Conseguir el registro
         $appointment = Appointment::where('id', $id)->first();
-        
-        if(!empty($appointment)){
-            // Borrarlo
+        */
+        $appointment = DB::select('select * from appointments where id = ?', [$id]);
+
+        if(count($appointment) > 0){
+            /* Borrarlo
             $appointment->delete();
+            */
+            DB::delete('delete from appointments where id=?', [$id]);
 
             // Devolver algo
             $data = [
@@ -201,16 +221,8 @@ class AppointmentController extends Controller
         return response()->json($data, $data['code']);
     }
     
-    private function getIdentity($request){
-        $jwtAuth = new JwtAuth();
-        $token = $request->header('Authorization', null);
-        $client = $jwtAuth->checkToken($token, true);
-        
-        return $client;
-    }
-    
-    public function getAppointmentsBycommerce($id){
-        $appointments = Appointment::where('commerce_id',$id)->get();
+    public function getAppointmentsByCommerce($id){
+         $appointments = DB::select('select * from appointments where commerce_id = ?', [$id]);
         
         return response()->json([
             'status' => 'success',
@@ -218,12 +230,20 @@ class AppointmentController extends Controller
         ], 200);
     }
 
-    public function getAppointmentsByclient($id){
-        $appointments = Appointment::where('client_id',$id)->get();
+    public function getAppointmentsByClient($id){
+        $appointments = DB::select('select * from appointments where client_id = ?', [$id]);
         
         return response()->json([
             'status' => 'success',
             'Appointments' => $appointments
         ], 200);
+    }
+
+    private function getIdentity($request){
+        $jwtAuth = new JwtAuth();
+        $token = $request->header('Authorization', null);
+        $client = $jwtAuth->checkToken($token, true);
+        
+        return $client;
     }
 }

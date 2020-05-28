@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB; // Con esto podemos hacer consultas por sql
 use App\Service;
 use App\Category;
 use App\Helpers\JwtAuth;
@@ -11,31 +12,29 @@ use App\Helpers\JwtAuth;
 class ServiceController extends Controller
 {
     public function __construct() {
-        $this->middleware('api.auth', ['except' => [
-            'index',
-            'show',
-            'getServicesBycommerce'
-        ]]);
+        $this->middleware('api.auth');
     }
     
-    public function index(){
-        $services = Service::all()->load('commerce', 'category');
+    public function show($id){ 
         
-        return response()->json([
-            'code' => 200,
-            'status' => 'success',
-            'Services' => $services
-        ], 200);
-    }
-    
-    public function show($id){
-        $service = Service::find($id)->load('commerce','category' );
-        
-        if(is_object($service)){
+        $service = DB::select('select * from services where id = ?', [$id]);
+
+        if(count($service) > 0){
+
+            $category = DB::select(
+            'select * from categories
+            INNER JOIN services  ON categories.id = services.category_id
+            where services.id = ?;', [$id]);
+            
+            $commerce = DB::select('select * from commerces where id = ?', [$service[0]->commerce_id]);
+
            $data = [
                 'code' => 200,
                 'status' => 'success',
-                'Services' => $service
+                'Services' => $service,
+                'Category' => $category,
+                'Commerce' => $commerce
+              
             ];
         }else{
             $data = [
@@ -62,7 +61,6 @@ class ServiceController extends Controller
             
             // Validar los datos
             $validate = \Validator::make($params_array, [
-                'commerce_id'=>'required',
                 'category_id'=>'required',
                 'name'=>'required',
                 'description'=>'required',
@@ -78,6 +76,8 @@ class ServiceController extends Controller
                   'error' => $validate->errors()
                 ];
             }else{
+
+                /*
                 // Guardar el articulo
                 $service = new Service();
                 $service->commerce_id = $commerce->id;
@@ -86,11 +86,24 @@ class ServiceController extends Controller
                 $service->description = $params->description;
                 $service->price = $params->price;
                 $service->save();
-                
+                */
+                $params_array['commerce_id'] = $commerce->id;
+                $params_array['created_at'] = new \DateTime();
+                $params_array['updated_at'] = new \DateTime();
+
+                DB::insert('insert into services (commerce_id, category_id, name, description, price, created_at, updated_at) values (?,?,?,?,?,?,?)',[
+                    $params_array['commerce_id'],
+                    $params_array['category_id'],
+                    $params_array['name'],
+                    $params_array['description'],
+                    $params_array['price'],
+                    $params_array['created_at'],
+                    $params_array['updated_at']]);
+
                 $data = [
                     'code' => 200,
                     'status' => 'success',
-                    'Service' => $service
+                    'Service' => $params_array
                   ];
             }
             
@@ -137,22 +150,35 @@ class ServiceController extends Controller
             unset($params_array['id']);
             unset($params_array['commerce_id']);
             unset($params_array['created_at']);
-            unset($params_array['commerce']);
             
-            // Conseguir usuario identificado
+            // Conseguir comercio identificado
             $commerce = $this->getIdentity($request);
 
-            // Buscar el registro a actualizar
+            /* Buscar el registro a actualizar
             $service = Service::where('id', $id)
                     ->where('commerce_id', $commerce->id)
                     ->first();
+            */
+            $service = DB::select('select * from services where id = ?', [$id]);
+            $category = DB::select('select * from categories where id = ?', [$params_array['category_id']]);
 
-
-            if(!empty($service) && is_object($service)){
+            if((count($service) > 0) && (count($category) > 0)){
                 
-                // Actualizar el registro en concreto
+                /* Actualizar el registro en concreto
                 $service->update($params_array);
-              
+                */
+
+                $params_array['id'] = $id;
+                $params_array['updated_at'] = new \DateTime();
+    
+                DB::update('update services set  category_id = ?, name = ?, description = ?, price = ?, updated_at = ? where id = ?',[
+                    $params_array['category_id'],
+                    $params_array['name'],
+                    $params_array['description'],
+                    $params_array['price'],
+                    $params_array['updated_at'],
+                    $params_array['id']]);
+
                 // Devolver algo
                 $data = array(
                     'code' => 200,
@@ -169,30 +195,28 @@ class ServiceController extends Controller
             ];
             $Service = Service::updateOrCreate($where, $params_array);
              * 
-             */
-
-            
+             */            
         }
         
         return response()->json($data, $data['code']);
     }
     
     public function destroy($id, Request $request){
-        // Conseguir usuario identificado
-        $commerce = $this->getIdentity($request);
-
-        //  Conseguir el registro
+        /* Conseguir el registro
         $Service = Service::where('id', $id)->first();
-        
-        if(!empty($Service)){
-            // Borrarlo
-            $Service->delete();
+        */
+        $service = DB::select('select * from services where id = ?', [$id]);
 
+        if(count($service) > 0){
+            /* Borrarlo
+            $Service->delete();
+            */
+            DB::delete('delete from services where id=?', [$id]);
             // Devolver algo
             $data = [
               'code' => 200,
               'status' => 'success',
-              'Service' => $Service
+              'Service' => $service
             ];
         }else{
             $data = [
@@ -213,13 +237,12 @@ class ServiceController extends Controller
         return $commerce;
     }
     
-    
-    public function getServicesBycommerce($id){
-        $Services = Service::where('commerce_id',$id)->get();
+    public function getServicesByCommerce($id){
+        $services = DB::select('select * from services where commerce_id = ?', [$id]);
         
         return response()->json([
             'status' => 'success',
-            'Services' => $Services
+            'Services' => $services
         ], 200);
     }
 }

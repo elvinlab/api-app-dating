@@ -108,8 +108,8 @@ class ClientController extends Controller
 
         // Validar esos datos
         $validate = \Validator::make($params_array, [
-                    'email' => 'required|email',
-                    'password' => 'required'
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
 
         if ($validate->fails()) {
@@ -150,12 +150,21 @@ class ClientController extends Controller
 
             // Sacar cliente identificado
             $client = $jwtAuth->checkToken($token, true);
+            
+            $params_array =  (array)$params;
+            // Validar datos
+            $validate = \Validator::make($params_array, [
+                'name' => 'required|alpha',
+                'email' => 'required|email|unique:clients' . $client->id,
+                'password' => 'required',
+                'address' => 'required',
+                'phone' => 'required'
+            ]);
 
                 //en angular validar si se modifica o no la contraseña
                 //$pwd = hash('sha256', $params->password);
                 //$params->password = $pwd;
-                $params_array =  (array)$params;
-
+            
             // Quitar los campos que no quiero actualizar
             unset($params_array['id']);
             unset($params_array['password']);
