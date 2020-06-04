@@ -163,14 +163,12 @@ class ClientController extends Controller
                 'phone' => 'required'
             ]);
 
-            //en angular validar si se modifica o no la contraseña
-            //$pwd = hash('sha256', $params->password);
-            //$params->password = $pwd;
+            //En angular validar si se modifica o no la contraseña
+            $pwd = hash('sha256', $params->password);
+            $params->password = $pwd;
 
             // Quitar los campos que no quiero actualizar
             unset($params_array['id']);
-            unset($params_array['password']);
-            unset($params_array['email']);
             unset($params_array['role']);
             unset($params_array['created_at']);
 
@@ -178,11 +176,14 @@ class ClientController extends Controller
             $client_update = Client::where('id', $client->id)->update($params_array);
             */
             $params_array['id'] = $client->id;
+            $params_array['password'] = $pwd;
             $params_array['updated_at'] = new \DateTime();
 
-            DB::update('update clients set name = ?, surname = ?, phone = ?, address = ?,  image = ?, updated_at = ? where id = ?', [
+            DB::update('update clients set name = ?, surname = ?, email = ?, password = ?, phone = ?, address = ?,  image = ?, updated_at = ? where id = ?', [
                 $params_array['name'],
                 $params_array['surname'],
+                $params_array['email'],
+                $params_array['password'],
                 $params_array['phone'],
                 $params_array['address'],
                 $params_array['image'],

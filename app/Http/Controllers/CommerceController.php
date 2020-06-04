@@ -153,6 +153,7 @@ class CommerceController extends Controller
         // Recoger los datos por post
         $json = $request->input('json', null);
         $params_array = json_decode($json, true);
+        $params =  json_decode($json);
 
         if ($checkToken && !empty($params_array)) {
 
@@ -169,27 +170,34 @@ class CommerceController extends Controller
                 'address' => 'required',
             ]);
 
+            //En angular validar si se modifica o no la contraseña
+            $pwd = hash('sha256', $params->password);
+            $params->password = $pwd;
+               
             // Quitar los campos que no quiero actualizar
             unset($params_array['id']);
-            unset($params_array['password']);
             unset($params_array['name_owner']);
-            unset($params_array['email']);
             unset($params_array['role']);
             unset($params_array['created_at']);
 
             $params_array['id'] = $commerce->id;
+            $params_array['password'] = $pwd;
             $params_array['updated_at'] = new \DateTime();
 
-            DB::update('update commerces set  name_commerce = ?, cell = ?, tell = ?, recovery_email = ?, description = ?, address = ?,  updated_at= ? where id = ?', [
+            DB::update('update commerces set  email = ?, password = ?, name_commerce = ?, cell = ?, tell = ?, recovery_email = ?, description = ?, address = ?,  image = ?, updated_at= ? where id = ?', [
+                $params_array['email'],
+                $params_array['password'],
                 $params_array['name_commerce'],
                 $params_array['cell'],
                 $params_array['tell'],
                 $params_array['recovery_email'],
                 $params_array['description'],
                 $params_array['address'],
+                $params_array['image'],
                 $params_array['updated_at'],
                 $params_array['id']
             ]);
+
 
             // Devolver array con resultado
             $data = array(
@@ -234,9 +242,6 @@ class CommerceController extends Controller
             //Guardamos en local storage la imagen
             $image_name = time() . $image->getClientOriginalName();
             \Storage::disk('commerces')->put($image_name, \File::get($image));
-
-            //Guardamos el nombre de la imagen en la base de datos
-            DB::update('update commerces set image = ? where id = ?', [$image_name, $client_image->id]);
 
             $data = array(
                 'code' => 200,
