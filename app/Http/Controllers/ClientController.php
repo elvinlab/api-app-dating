@@ -180,11 +180,12 @@ class ClientController extends Controller
             $params_array['id'] = $client->id;
             $params_array['updated_at'] = new \DateTime();
 
-            DB::update('update clients set name = ?, surname = ?, phone = ?, address = ?, updated_at = ? where id = ?', [
+            DB::update('update clients set name = ?, surname = ?, phone = ?, address = ?,  image = ?, updated_at = ? where id = ?', [
                 $params_array['name'],
                 $params_array['surname'],
                 $params_array['phone'],
                 $params_array['address'],
+                $params_array['image'],
                 $params_array['updated_at'],
                 $params_array['id']
             ]);
@@ -232,9 +233,6 @@ class ClientController extends Controller
             //Guardamos en local storage la imagen
             $image_name = time() . $image->getClientOriginalName();
             \Storage::disk('clients')->put($image_name, \File::get($image));
-
-            //Guardamos el nombre de la imagen en la base de datos
-            DB::update('update clients set image = ? where id = ?', [$image_name, $client_image->id]);
 
             $data = array(
                 'code' => 200,

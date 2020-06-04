@@ -21,7 +21,7 @@ Route::post('/api/client/register', 'ClientController@register');
 Route::post('/api/client/login', 'ClientController@login');
 Route::put('/api/client/update', 'ClientController@update');
 Route::post('/api/client/upload' ,'ClientController@upload')->middleware(ApiAuthMiddleware::class);
-Route::get('/api/client/avatar/{filename}', 'ClientController@getImage')->middleware(ApiAuthMiddleware::class);
+Route::get('/api/client/avatar/{filename}', 'ClientController@getImage');
 Route::get('/api/client/detail/{id}', 'ClientController@detail')->middleware(ApiAuthMiddleware::class);
 
 //Rutas del controlador Comercio
@@ -29,7 +29,7 @@ Route::post('/api/commerce/register', 'CommerceController@register');
 Route::post('/api/commerce/login', 'CommerceController@login');
 Route::put('/api/commerce/update', 'CommerceController@update');
 Route::post('/api/commerce/upload' ,'CommerceController@upload')->middleware(ApiAuthMiddleware::class);
-Route::get('/api/commerce/avatar/{filename}', 'CommerceController@getImage')->middleware(ApiAuthMiddleware::class);
+Route::get('/api/commerce/avatar/{filename}', 'CommerceController@getImage');
 Route::get('/api/commerce/detail/{id}', 'CommerceController@detail')->middleware(ApiAuthMiddleware::class);
 
 // Rutas del controlador de Categoria
