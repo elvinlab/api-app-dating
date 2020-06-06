@@ -151,6 +151,38 @@ class CategoryController extends Controller
         return response()->json($data, $data['code']);
     }
 
+    public function destroy($id, Request $request)
+    {
+        /* Conseguir el registro
+        $category = category::where('id', $id)->first();
+        */
+
+        $category = DB::select('select * from categories where id = ?', [$id]);
+
+        if (count($category) > 0) {
+            /*Borrarlo
+            $category->delete();
+            */
+
+            DB::delete('delete from categories where id=?', [$id]);
+
+            // Devolver algo
+            $data = [
+                'code' => 200,
+                'status' => 'success',
+                'category' => $category
+            ];
+        } else {
+            $data = [
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'La categoria no existe'
+            ];
+        }
+
+        return response()->json($data, $data['code']);
+    }
+
     private function getIdentity($request)
     {
         $jwtAuth = new JwtAuth();
@@ -159,5 +191,6 @@ class CategoryController extends Controller
 
         return $commerce;
     }
-    //No se puede eliminar porque esto no lo puede hacer ninguno de estos roles, seria solo el rol de admin que en este proyecto no entra
+   
+
 }
