@@ -176,7 +176,6 @@ class CommerceController extends Controller
                
             // Quitar los campos que no quiero actualizar
             unset($params_array['id']);
-            unset($params_array['name_owner']);
             unset($params_array['role']);
             unset($params_array['created_at']);
 
@@ -184,10 +183,11 @@ class CommerceController extends Controller
             $params_array['password'] = $pwd;
             $params_array['updated_at'] = new \DateTime();
 
-            DB::update('update commerces set  email = ?, password = ?, name_commerce = ?, cell = ?, tell = ?, recovery_email = ?, description = ?, address = ?,  image = ?, updated_at= ? where id = ?', [
+            DB::update('update commerces set  email = ?, password = ?, name_commerce = ?,name_owner = ?, cell = ?, tell = ?, recovery_email = ?, description = ?, address = ?,  image = ?, updated_at= ? where id = ?', [
                 $params_array['email'],
                 $params_array['password'],
                 $params_array['name_commerce'],
+                $params_array['name_owner'],
                 $params_array['cell'],
                 $params_array['tell'],
                 $params_array['recovery_email'],
