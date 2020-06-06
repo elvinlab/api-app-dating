@@ -186,7 +186,7 @@ class CategoryController extends Controller
 
     public function getCategoriesByCommerce($id)
     {
-        $commerces = DB::select('select * from commerces where commerce_id = ?', [$id]);
+        $commerces = DB::select('select * from categories where commerce_id = ?', [$id]);
 
         return response()->json([
             'status' => 'success',
