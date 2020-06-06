@@ -34,4 +34,9 @@ class Commerce extends Model
     {
         return $this->hasMany('App\Appointment');
     }
+
+    public function categories()
+    {
+        return $this->hasMany('App\Category');
+    }
 }

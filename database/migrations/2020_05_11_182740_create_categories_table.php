@@ -15,9 +15,12 @@ class CreateCategoriesTable extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+            $table->string('commerce_id',36);
             $table->string('name')->unique();
-            $table->longText('descripton');
+            $table->longText('description');
             $table->timestamps();
+
+            $table->foreign('commerce_id')->references('id')->on('commerces');
         });
     }
 

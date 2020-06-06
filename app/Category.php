@@ -1,4 +1,4 @@
- <?php
+<?php
 
 namespace App;
 
@@ -11,5 +11,10 @@ class Category extends Model
     public function services()
     {// Una Categoria va tener muchos servicios
         return $this->hasMany('App\Service');
+    }
+
+    public function commerce()
+    {
+        return $this->belongsTo('App\Commerce');
     }
 }

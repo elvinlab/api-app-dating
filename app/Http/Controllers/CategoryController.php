@@ -72,7 +72,7 @@ class CategoryController extends Controller
                 /*
                 $category = new Category();
                 $category->name = $params_array['name'];
-                $category->descripton = $params_array['descripton'];
+                $category->description = $params_array['description'];
                 $category->save();
                 */
 
@@ -80,9 +80,9 @@ class CategoryController extends Controller
                 $params_array['created_at'] = new \DateTime();
                 $params_array['updated_at'] = new \DateTime();
 
-                DB::insert('insert into categories (name, descripton, created_at, updated_at) values (?,?,?,?)', [
+                DB::insert('insert into categories (name, description, created_at, updated_at) values (?,?,?,?)', [
                     $params_array['name'],
-                    $params_array['descripton'],
+                    $params_array['description'],
                     $params_array['created_at'],
                     $params_array['updated_at']
                 ]);
@@ -128,8 +128,8 @@ class CategoryController extends Controller
             $params_array['id'] = $id;
             $params_array['updated_at'] = new \DateTime();
 
-            DB::update('update categories set descripton = ?, updated_at = ? where id = ?', [
-                $params_array['descripton'],
+            DB::update('update categories set description = ?, updated_at = ? where id = ?', [
+                $params_array['description'],
                 $params_array['updated_at'],
                 $params_array['id']
             ]);
@@ -181,6 +181,16 @@ class CategoryController extends Controller
         }
 
         return response()->json($data, $data['code']);
+    }
+
+    public function getCategoriesByCommerce($id)
+    {
+        $commerces = DB::select('select * from commerces where commerce_id = ?', [$id]);
+
+        return response()->json([
+            'status' => 'success',
+            'Services' => $commerces
+        ], 200);
     }
 
     private function getIdentity($request)
