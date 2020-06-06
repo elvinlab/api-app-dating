@@ -80,8 +80,9 @@ class CategoryController extends Controller
                 $params_array['created_at'] = new \DateTime();
                 $params_array['updated_at'] = new \DateTime();
 
-                DB::insert('insert into categories (name, description, created_at, updated_at) values (?,?,?,?)', [
+                DB::insert('insert into categories (name, commerce_id, description, created_at, updated_at) values (?,?,?,?,?)', [
                     $params_array['name'],
+                    $params_array['commerce_id'],
                     $params_array['description'],
                     $params_array['created_at'],
                     $params_array['updated_at']
