@@ -34,6 +34,7 @@ Route::get('/api/commerce/detail/{id}', 'CommerceController@detail')->middleware
 
 // Rutas del controlador de Categoria
 Route::resource('/api/category', 'CategoryController');
+Route::get('/api/category/getcategories/{id}', 'CategoryController@getCategoriesByCommerce');
     
 // Rutas del controlador de promocion
 Route::resource('/api/promotion', 'PromotionController'); //CRUD
