@@ -18,7 +18,7 @@ class CreateCommercesTable extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('name_owner');
-            $table->string('name_commerce');
+            $table->string('name_commerce')->unique();
             $table->string('role');
             $table->string('cell')->nullable();
             $table->string('tell');
