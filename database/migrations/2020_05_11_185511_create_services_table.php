@@ -18,7 +18,7 @@ class CreateServicesTable extends Migration
             $table->string('commerce_id',36);
             $table->bigInteger('category_id')->unsigned();
             $table->string('name');
-            $table->mediumText('description');
+            $table->text('description');
             $table->double('price', 8, 2);
             $table->timestamps();
 

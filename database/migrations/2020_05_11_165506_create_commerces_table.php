@@ -23,7 +23,7 @@ class CreateCommercesTable extends Migration
             $table->string('cell')->nullable();
             $table->string('tell');
             $table->string('recovery_email')->nullable();
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->string('address');
             $table->string('image')->nullable();
             $table->timestamps();

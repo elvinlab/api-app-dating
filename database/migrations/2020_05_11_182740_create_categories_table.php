@@ -17,7 +17,7 @@ class CreateCategoriesTable extends Migration
             $table->id();
             $table->string('commerce_id',36);
             $table->string('name')->unique();
-            $table->longText('description');
+            $table->text('description');
             $table->timestamps();
 
             $table->foreign('commerce_id')->references('id')->on('commerces');

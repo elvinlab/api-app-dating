@@ -20,7 +20,7 @@ class CreatePromotionsTable extends Migration
             $table->integer('max');
             $table->integer('amount')->nullable();
             $table->dateTime('expiry');
-            $table->longText('description');
+            $table->text('description');
             $table->string('image')->nullable();
             $table->float('discount')->nullable();;
             $table->timestamps();
