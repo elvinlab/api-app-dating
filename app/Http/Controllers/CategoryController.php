@@ -129,7 +129,8 @@ class CategoryController extends Controller
             $params_array['id'] = $id;
             $params_array['updated_at'] = new \DateTime();
 
-            DB::update('update categories set description = ?, updated_at = ? where id = ?', [
+            DB::update('update categories set name = ?, description = ?, updated_at = ? where id = ?', [
+                $params_array['name'],
                 $params_array['description'],
                 $params_array['updated_at'],
                 $params_array['id']
