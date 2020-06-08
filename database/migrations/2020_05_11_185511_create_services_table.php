@@ -19,7 +19,7 @@ class CreateServicesTable extends Migration
             $table->bigInteger('category_id')->unsigned();
             $table->string('name');
             $table->text('description');
-            $table->double('price', 8, 2);
+            $table->double('price');
             $table->timestamps();
 
             $table->foreign('commerce_id')->references('id')->on('commerces');
