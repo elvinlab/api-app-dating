@@ -39,6 +39,7 @@ Route::get('/api/category/getcategories/{id}', 'CategoryController@getCategories
 // Rutas del controlador de promocion
 Route::resource('/api/promotion', 'PromotionController'); //CRUD
 Route::get('/api/promotion/getpromos/{id}', 'PromotionController@getPromotionsByCommerce'); //optener promos por medio de la llave foranea
+Route::get('/api/promotion/getvalidpromotion/{id}', 'PromotionController@getValidPromotion');
 Route::post('/api/promotion/upload' ,'PromotionController@upload');
 Route::get('/api/promotion/image/{filename}', 'PromotionController@getImage');
    

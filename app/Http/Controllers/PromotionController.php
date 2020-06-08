@@ -96,7 +96,7 @@ class PromotionController extends Controller
                 $promotion->save();
                 */
                 $params_array['commerce_id'] = $commerce->id;
-                strtotime($params_array['expiry']) ;
+                strtotime($params_array['expiry']);
                 $params_array['created_at'] = new \DateTime();
                 $params_array['updated_at'] = new \DateTime();
                     
@@ -312,6 +312,20 @@ class PromotionController extends Controller
     public function getPromotionsByCommerce($id)
     {
         $promotions = DB::select('select * from promotions where commerce_id = ?', [$id]);
+
+        return response()->json([
+            'status' => 'success',
+            'promotions' => $promotions
+        ], 200);
+    }
+
+
+
+    public function getValidPromotion($expiry)
+    {
+        strtotime($expiry);
+        $promotions = DB::select('select * from commerces
+        INNER JOIN promotions  where (expiry >= ? AND amount < max) and commerces.id = promotions.commerce_id', [$expiry]);
 
         return response()->json([
             'status' => 'success',
