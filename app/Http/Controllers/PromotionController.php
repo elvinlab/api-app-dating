@@ -19,14 +19,14 @@ class PromotionController extends Controller
     public function index()
     {
         $promotions = DB::select(
-            'select * from promotions
-            INNER JOIN commerces ON commerces.id = promotions.commerce_id'
+            'select * from commerces
+            INNER JOIN promotions ON commerces.id = promotions.commerce_id'
         );
 
         return response()->json([
             'code' => 200,
             'status' => 'success',
-            'Promotions' => $promotions
+            'promotions' => $promotions
         ], 200);
     }
 
@@ -40,8 +40,8 @@ class PromotionController extends Controller
             $data = [
                 'code' => 200,
                 'status' => 'success',
-                'Promotions' => $promotion,
-                'Commerce' => $commerce,
+                'promotion' => $promotion,
+                'commerce' => $commerce,
             ];
         } else {
             $data = [
