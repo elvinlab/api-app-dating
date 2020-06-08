@@ -22,7 +22,7 @@ class CreatePromotionsTable extends Migration
             $table->date('expiry');
             $table->text('description');
             $table->string('image')->nullable();
-            $table->float('discount')->nullable();;
+            $table->integer('discount')->nullable();;
             $table->timestamps();
 
             $table->foreign('commerce_id')->references('id')->on('commerces');
