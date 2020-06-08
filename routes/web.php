@@ -43,10 +43,6 @@ Route::get('/api/promotion/getvalidpromotion/{id}', 'PromotionController@getVali
 Route::post('/api/promotion/upload' ,'PromotionController@upload');
 Route::get('/api/promotion/image/{filename}', 'PromotionController@getImage');
    
-// Rutas del controlador de Venta   
-Route::resource('/api/sale', 'SaleController'); //CRUD
-Route::get('/api/sale/getsalescommerce/{id}', 'SaleController@getSalesByCommerce');
-
 // Rutas del controlador de Servicio
 Route::resource('/api/service', 'ServiceController'); //CRUD
 Route::get('/api/service/getservicecommerce/{id}', 'ServiceController@getServicesByCommerce');

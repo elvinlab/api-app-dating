@@ -1,5 +1,4 @@
-    <?php
-
+<?php
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
@@ -13,10 +12,6 @@ class Service extends Model
     public function category()
     {// Muchos Servicios estaran en una categoria
         return $this->belongsTo('App\Category');//Category es foranea en services
-    }
-    public function sales()
-    {//Un servicio puede tener muchas ventas
-        return $this->hasMany('App/Sale');
     }
 
     public function commerce()
