@@ -10,8 +10,11 @@ class PromotionController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('api.auth');
-    }
+        $this->middleware('api.auth', ['except' => [
+            'index',
+            'show',
+            'getImage'
+        ]]);}
 
     public function index()
     {
