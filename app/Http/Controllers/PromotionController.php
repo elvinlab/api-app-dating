@@ -71,7 +71,6 @@ class PromotionController extends Controller
                 'expiry' => 'required',
                 'description' => 'required',
                 'discount' => 'required',
-                'image' => 'required',
             ]);
 
             if ($validate->fails()) {
@@ -94,10 +93,11 @@ class PromotionController extends Controller
                 $promotion->save();
                 */
                 $params_array['commerce_id'] = $commerce->id;
+                strtotime($params_array['expiry']) ;
                 $params_array['created_at'] = new \DateTime();
                 $params_array['updated_at'] = new \DateTime();
-
-                DB::insert('insert into promotions (commerce_id, coupon, max, amount, expiry, description, discount, created_at, updated_at) values (?,?,?,?,?,?,?,?,?)', [
+                    
+                DB::insert('insert into promotions (commerce_id, coupon, max, amount, expiry, description, discount, image, created_at, updated_at) values (?,?,?,?,?,?,?,?,?,?)', [
                     $params_array['commerce_id'],
                     $params_array['coupon'],
                     $params_array['max'],
@@ -105,6 +105,7 @@ class PromotionController extends Controller
                     $params_array['expiry'],
                     $params_array['description'],
                     $params_array['discount'],
+                    $params_array['image'],
                     $params_array['created_at'],
                     $params_array['updated_at']
                 ]);
@@ -180,12 +181,13 @@ class PromotionController extends Controller
                 $params_array['id'] = $id;
                 $params_array['updated_at'] = new \DateTime();
 
-                DB::update('update promotions set max = ?, amount = ?, expiry = ?, description = ?, discount = ?,  updated_at = ? where id = ?', [
+                DB::update('update promotions set max = ?, amount = ?, expiry = ?, description = ?, discount = ?, image = ?,  updated_at = ? where id = ?', [
                     $params_array['max'],
                     $params_array['amount'],
                     $params_array['expiry'],
                     $params_array['description'],
                     $params_array['discount'],
+                    $params_array['image'],
                     $params_array['updated_at'],
                     $params_array['id']
                 ]);
@@ -244,7 +246,7 @@ class PromotionController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function upload($id, Request $request)
+    public function upload(Request $request)
     {
         // Recoger la imagen de la petición
 
@@ -270,9 +272,6 @@ class PromotionController extends Controller
             /*Guardamos el nombre de la imagen en la base de datos
              Promotion::where('id', $id)->update(array('image' => $image_name));
             */
-
-            //Guardamos el nombre de la imagen en la base de datos
-            DB::update('update promotions set image = ? where id = ?', [$image_name, $id]);
 
             $data = [
                 'code' => 200,
@@ -309,11 +308,11 @@ class PromotionController extends Controller
 
     public function getPromotionsByCommerce($id)
     {
-        $services = DB::select('select * from promotions where commerce_id = ?', [$id]);
+        $promotions = DB::select('select * from promotions where commerce_id = ?', [$id]);
 
         return response()->json([
             'status' => 'success',
-            'Services' => $services
+            'promotions' => $promotions
         ], 200);
     }
 
