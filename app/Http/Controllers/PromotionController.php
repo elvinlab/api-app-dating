@@ -265,7 +265,7 @@ class PromotionController extends Controller
                 'message' => 'Error al subir la imagen'
             ];
         } else {
-            $image_name = time() . $image->getClientOriginalName();
+            $image_name = time().$image->getClientOriginalName();
 
             \Storage::disk('promotions')->put($image_name, \File::get($image));
 
