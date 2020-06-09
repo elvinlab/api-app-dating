@@ -9,8 +9,11 @@ class ServiceController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('api.auth');
-    }
+        $this->middleware('api.auth', ['except' => [
+            'index',
+            'show',
+            'getImage'
+        ]]);}
 
     public function show($id)
     {
@@ -31,9 +34,9 @@ class ServiceController extends Controller
             $data = [
                 'code' => 200,
                 'status' => 'success',
-                'Services' => $service,
-                'Category' => $category,
-                'Commerce' => $commerce
+                'services' => $service,
+                'category' => $category,
+                'commerce' => $commerce
 
             ];
         } else {
@@ -105,7 +108,7 @@ class ServiceController extends Controller
                 $data = [
                     'code' => 200,
                     'status' => 'success',
-                    'Service' => $params_array
+                    'service' => $params_array
                 ];
             }
         } else {
@@ -186,7 +189,7 @@ class ServiceController extends Controller
                 $data = array(
                     'code' => 200,
                     'status' => 'success',
-                    'Service' => $service,
+                    'service' => $service,
                     'changes' => $params_array
                 );
             }
@@ -220,7 +223,7 @@ class ServiceController extends Controller
             $data = [
                 'code' => 200,
                 'status' => 'success',
-                'Service' => $service
+                'service' => $service
             ];
         } else {
             $data = [
@@ -248,7 +251,7 @@ class ServiceController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'Services' => $services
+            'services' => $services
         ], 200);
     }
 }
