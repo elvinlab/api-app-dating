@@ -321,8 +321,6 @@ class PromotionController extends Controller
         ], 200);
     }
 
-
-
     public function getValidPromotion($expiry)
     {
         strtotime($expiry);
