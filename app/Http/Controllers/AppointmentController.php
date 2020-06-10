@@ -190,49 +190,6 @@ namespace App\Http\Controllers;
             return response()->json($data, $data['code']);
         }
 
-        public function destroy($id, Request $request)
-        {
-            // Conseguir usuario identificado
-            $commerce = $this->getIdentity($request);
-
-            /*  Conseguir el registro
-$appointment = Appointment::where('id', $id)->first();
-*/
-            $appointment = DB::select('select * from appointments where id = ?', [$id]);
-
-            if (count($appointment) > 0) {
-                /* Borrarlo
-    $appointment->delete();
-    */
-                DB::delete('delete from appointments where id=?', [$id]);
-
-                // Devolver algo
-                $data = [
-                    'code' => 200,
-                    'status' => 'success',
-                    'Appointment' => $appointment
-                ];
-            } else {
-                $data = [
-                    'code' => 404,
-                    'status' => 'error',
-                    'message' => 'la cita no existe'
-                ];
-            }
-
-            return response()->json($data, $data['code']);
-        }
-
-        public function getAppointmentsByCommerce($id)
-        {
-            $appointments = DB::select('select * from appointments where commerce_id = ?', [$id]);
-
-            return response()->json([
-                'status' => 'success',
-                'Appointments' => $appointments
-            ], 200);
-        }
-
         public function getAppointmentsByClient($id)
         {
             $appointments = DB::select('select * from appointments where client_id = ?', [$id]);

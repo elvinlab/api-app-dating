@@ -13,7 +13,9 @@ class PromotionController extends Controller
         $this->middleware('api.auth', ['except' => [
             'index',
             'show',
-            'getImage'
+            'getImage',
+            'getValidPromotion',
+            'getPromotionsByCommerce'
         ]]);}
 
     public function index()

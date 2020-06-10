@@ -10,7 +10,7 @@ class CategoryController extends Controller
 
     public function __construct()
     {
-        $this->middleware('api.auth');
+        $this->middleware('api.auth', ['except' => ['index','show', 'getServicesCategory']]);
     }
 
     public function index()
@@ -185,16 +185,6 @@ class CategoryController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function getCategoriesByCommerce($id)
-    {
-        $categories = DB::select('select * from categories where commerce_id = ?', [$id]);
-
-        return response()->json([
-            'status' => 'success',
-            'categories' => $categories
-        ], 200);
-    }
-
     private function getIdentity($request)
     {
         $jwtAuth = new JwtAuth();
@@ -203,6 +193,5 @@ class CategoryController extends Controller
 
         return $commerce;
     }
-   
-
+    
 }
