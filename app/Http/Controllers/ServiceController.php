@@ -12,9 +12,24 @@ class ServiceController extends Controller
         $this->middleware('api.auth', ['except' => [
             'index',
             'show',
-            'getImage'
+            'getImage',
+            'getServicesByCommerce'
         ]]);}
 
+        public function index()
+        {
+            $services = DB::select(
+                'select * from commerces
+                INNER JOIN services ON commerces.id = services.commerce_id'
+            );
+    
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'services' => $services
+            ], 200);
+        }
+    
     public function show($id)
     {
 
@@ -247,11 +262,11 @@ class ServiceController extends Controller
 
     public function getServicesByCommerce($id)
     {
-        $services = DB::select('select * from services where commerce_id = ?', [$id]);
+        $servicesCommerce = DB::select('select * from services where commerce_id = ?', [$id]);
 
         return response()->json([
             'status' => 'success',
-            'services' => $services
+            'servicesCommerce' => $servicesCommerce
         ], 200);
     }
 }
