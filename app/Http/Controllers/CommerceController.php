@@ -8,6 +8,17 @@ use Uuid;
 
 class CommerceController extends Controller
 {
+    public function getCommerces()
+    {
+        $commerces = DB::select('select name_owner, name_commerce, cell, tell, address, description, image from commerces');
+
+        return response()->json([
+            'code' => 200,
+            'status' => 'success',
+            'commerces' => $commerces
+        ]);
+    }
+
     public function register(Request $request)
     {
 

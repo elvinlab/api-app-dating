@@ -28,6 +28,7 @@ Route::get('/api/client/detail/{id}', 'ClientController@detail')->middleware(Api
 Route::post('/api/commerce/register', 'CommerceController@register');
 Route::post('/api/commerce/login', 'CommerceController@login');
 Route::put('/api/commerce/update', 'CommerceController@update');
+Route::get('/api/getcommerces', 'CommerceController@getCommerces');
 Route::post('/api/commerce/upload' ,'CommerceController@upload')->middleware(ApiAuthMiddleware::class);
 Route::get('/api/commerce/avatar/{filename}', 'CommerceController@getImage');
 Route::get('/api/commerce/detail/{id}', 'CommerceController@detail')->middleware(ApiAuthMiddleware::class);
@@ -38,7 +39,7 @@ Route::resource('/api/category', 'CategoryController');
 // Rutas del controlador de promocion
 Route::resource('/api/promotion', 'PromotionController'); //CRUD
 Route::get('/api/promotion/getpromos/{id}', 'PromotionController@getPromotionsByCommerce'); //optener promos por medio de la llave foranea
-Route::get('/api/promotion/getvalidpromotion/{id}', 'PromotionController@getValidPromotion');
+Route::get('/api/promotion/getvalidpromotion/{date}', 'PromotionController@getValidPromotion');
 Route::post('/api/promotion/upload' ,'PromotionController@upload');
 Route::get('/api/promotion/image/{filename}', 'PromotionController@getImage');
    
