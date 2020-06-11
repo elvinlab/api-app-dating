@@ -29,6 +29,7 @@ Route::post('/api/commerce/register', 'CommerceController@register');
 Route::post('/api/commerce/login', 'CommerceController@login');
 Route::put('/api/commerce/update', 'CommerceController@update');
 Route::get('/api/getcommerces', 'CommerceController@getCommerces');
+Route::get('/api/getcommerce/{id}', 'CommerceController@getCommerce');
 Route::post('/api/commerce/upload' ,'CommerceController@upload')->middleware(ApiAuthMiddleware::class);
 Route::get('/api/commerce/avatar/{filename}', 'CommerceController@getImage');
 Route::get('/api/commerce/detail/{id}', 'CommerceController@detail')->middleware(ApiAuthMiddleware::class);
@@ -49,5 +50,8 @@ Route::get('/api/getservicecommerce/{id}', 'ServiceController@getServicesByComme
 
 // Rutas del controlador de Cita
 Route::resource('/api/appointment', 'AppointmentController'); //CRUD
-Route::get('/api/appointment/getdatecommerce/{id}', 'AppointmentController@getAppointmentsByCommerce'); 
-Route::get('/api/appointment/getdateclient/{id}', 'AppointmentController@getAppointmentsByClient');
+Route::get('/api/getappointmentscommerce/{id}', 'AppointmentController@getAppointmentsByCommerce'); 
+Route::get('/api/getappointmentsclient/{id}', 'AppointmentController@getAppointmentsByClient');
+Route::get('/api/getappointmentsclient2/{id}', 'AppointmentController@getAppointmentsByClient2');
+Route::get('/api/getappointmentsclient3/{id}', 'AppointmentController@getAppointmentsByClient3');
+Route::get('/api/getappointmentsclient4/{id}', 'AppointmentController@getAppointmentsByClient4');

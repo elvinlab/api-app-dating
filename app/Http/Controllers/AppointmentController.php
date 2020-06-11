@@ -11,6 +11,17 @@ namespace App\Http\Controllers;
         {
             $this->middleware('api.auth');
         }
+    
+        public function index()
+        {
+            $appointments = DB::select('select * from appointments');
+    
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'appointments' => $appointments
+            ]);
+        }
 
         public function show($id)
         {
@@ -23,9 +34,9 @@ namespace App\Http\Controllers;
                 $data = [
                     'code' => 200,
                     'status' => 'success',
-                    'Appointments' => $appointment,
-                    'Service' => $service,
-                    'Commerce' => $commerce,
+                    'appointment' => $appointment,
+                    'service' => $service,
+                    'commerce' => $commerce,
                 ];
             } else {
                 $data = [
@@ -37,6 +48,40 @@ namespace App\Http\Controllers;
 
             return response()->json($data, $data['code']);
         }
+
+
+    public function destroy($id, Request $request)
+    {
+        /* Conseguir el registro
+        $promotion = Promotion::where('id', $id)->first();
+        */
+
+        $appointment = DB::select('select * from appointments where id = ?', [$id]);
+
+        if (count($appointment) > 0) {
+            /*Borrarlo
+            $promotion->delete();
+            */
+
+            DB::delete('delete from appointments where id=?', [$id]);
+
+            // Devolver algo
+            $data = [
+                'code' => 200,
+                'status' => 'success',
+                'appointment' => $appointment
+            ];
+        } else {
+            $data = [
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'El cita no existe'
+            ];
+        }
+
+        return response()->json($data, $data['code']);
+    }
+
 
         public function store(Request $request)
         {
@@ -192,11 +237,80 @@ namespace App\Http\Controllers;
 
         public function getAppointmentsByClient($id)
         {
-            $appointments = DB::select('select * from appointments where client_id = ?', [$id]);
-
+     
+            $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id,appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
+            FROM appointments
+            INNER JOIN  commerces ON commerces.id = appointments.commerce_id 
+            INNER JOIN  services ON services.id = appointments.service_id
+            INNER JOIN  clients ON clients.id = appointments.client_id
+            WHERE clients.id = ?', [$id]);
             return response()->json([
                 'status' => 'success',
-                'Appointments' => $appointments
+                'appointments' => $appointments,
+          
+            ], 200);
+        }
+        public function getAppointmentsByClient2($id)
+        {
+     
+            $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id,appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
+            FROM appointments
+            INNER JOIN  commerces ON commerces.id = appointments.commerce_id 
+            INNER JOIN  services ON services.id = appointments.service_id
+            INNER JOIN  clients ON clients.id = appointments.client_id
+            WHERE  (clients.id = ? AND appointments.status = "CONFIRMADA")', [$id]);
+            return response()->json([
+                'status' => 'success',
+                'appointments' => $appointments,
+          
+            ], 200);
+        }
+
+        public function getAppointmentsByClient3($id)
+        {
+     
+            $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id,appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
+            FROM appointments
+            INNER JOIN  commerces ON commerces.id = appointments.commerce_id 
+            INNER JOIN  services ON services.id = appointments.service_id
+            INNER JOIN  clients ON clients.id = appointments.client_id
+            WHERE (clients.id = ? AND appointments.status = "CANCELADA")', [$id]);
+            return response()->json([
+                'status' => 'success',
+                'appointments' => $appointments,
+          
+            ], 200);
+        }
+
+        public function getAppointmentsByClient4($id)
+        {
+     
+            $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id,appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
+            FROM appointments
+            INNER JOIN  commerces ON commerces.id = appointments.commerce_id 
+            INNER JOIN  services ON services.id = appointments.service_id
+            INNER JOIN  clients ON clients.id = appointments.client_id
+            WHERE (clients.id = ? AND appointments.status = "PENDIENTE")', [$id]);
+            return response()->json([
+                'status' => 'success',
+                'appointments' => $appointments,
+          
+            ], 200);
+        }
+
+        public function getAppointmentsByCommerce($id)
+        {
+     
+            $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id,appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
+            FROM appointments
+            INNER JOIN  commerces ON commerces.id = appointments.commerce_id 
+            INNER JOIN  services ON services.id = appointments.service_id
+            INNER JOIN  clients ON clients.id = appointments.client_id
+            WHERE commerces.id = ? ', [$id]);
+            return response()->json([
+                'status' => 'success',
+                'appointments' => $appointments,
+          
             ], 200);
         }
 
