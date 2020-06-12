@@ -124,7 +124,7 @@ namespace App\Http\Controllers;
         */
 
                     $params_array['client_id'] = $client->id;
-                    $params_array['status'] = 'CONFIRMADA';
+                    $params_array['status'] = 'CANCELADA';
                     $params_array['created_at'] = new \DateTime();
                     $params_array['updated_at'] = new \DateTime();
 
@@ -235,7 +235,7 @@ namespace App\Http\Controllers;
             return response()->json($data, $data['code']);
         }
 
-        public function getAppointmentsByClient($id)
+        public function getAppointmentsByClientRecord($id)
         {
      
             $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id,appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
@@ -250,7 +250,7 @@ namespace App\Http\Controllers;
           
             ], 200);
         }
-        public function getAppointmentsByClient2($id)
+        public function getAppointmentsByClientConfirmed($id)
         {
      
             $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id,appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
@@ -266,7 +266,7 @@ namespace App\Http\Controllers;
             ], 200);
         }
 
-        public function getAppointmentsByClient3($id)
+        public function getAppointmentsByClientCanceled($id)
         {
      
             $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id,appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
@@ -282,10 +282,9 @@ namespace App\Http\Controllers;
             ], 200);
         }
 
-        public function getAppointmentsByClient4($id)
+        public function getAppointmentsByClientPending($id)
         {
-     
-            $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id,appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
+            $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id, appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
             FROM appointments
             INNER JOIN  commerces ON commerces.id = appointments.commerce_id 
             INNER JOIN  services ON services.id = appointments.service_id
@@ -298,10 +297,25 @@ namespace App\Http\Controllers;
             ], 200);
         }
 
-        public function getAppointmentsByCommerce($id)
+        public function getAppointmentsByCommercePending($id)
+        {
+            $appointments = DB::select('SELECT  commerces.name_commerce, clients.name AS nameClient, services.price,  services.name ,clients.phone, appointments.client_id, appointments.id, appointments.commerce_id, appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
+            FROM appointments
+            INNER JOIN  commerces ON commerces.id = appointments.commerce_id 
+            INNER JOIN  services ON services.id = appointments.service_id
+            INNER JOIN  clients ON clients.id = appointments.client_id
+            WHERE (commerces.id = ? AND appointments.status = "PENDIENTE")', [$id]);
+            return response()->json([
+                'status' => 'success',
+                'appointments' => $appointments,
+          
+            ], 200);
+        }
+
+        public function getAppointmentsByCommerceRecord($id)
         {
      
-            $appointments = DB::select('SELECT  commerces.name_commerce, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id,appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
+            $appointments = DB::select('SELECT commerces.name_commerce, clients.name AS nameClient, clients.phone, services.name, services.price,  appointments.client_id, appointments.id, appointments.commerce_id, appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
             FROM appointments
             INNER JOIN  commerces ON commerces.id = appointments.commerce_id 
             INNER JOIN  services ON services.id = appointments.service_id
