@@ -25,7 +25,7 @@ class CreateAppointmentsTable extends Migration
 
             $table->foreign('client_id')->references('id')->on('clients');
             $table->foreign('commerce_id')->references('id')->on('commerces');
-            $table->foreign('service_id')->references('id')->on('services');
+            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
         });
     }
 
