@@ -124,7 +124,7 @@ namespace App\Http\Controllers;
         */
 
                     $params_array['client_id'] = $client->id;
-                    $params_array['status'] = 'CANCELADA';
+                    $params_array['status'] = 'PENDIENTE';
                     $params_array['created_at'] = new \DateTime();
                     $params_array['updated_at'] = new \DateTime();
 
