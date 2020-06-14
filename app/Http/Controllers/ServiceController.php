@@ -18,10 +18,8 @@ class ServiceController extends Controller
 
         public function index()
         {
-            $services = DB::select(
-                'select * from commerces
-                INNER JOIN services ON commerces.id = services.commerce_id'
-            );
+            $services = DB::select('select services.id, services.name, services.price, services.description, services.category_id, services.commerce_id, commerces.image, commerces.name_commerce, commerces.address  from services
+        INNER JOIN commerces  ON commerces.id = services.commerce_id');
     
             return response()->json([
                 'code' => 200,
@@ -30,29 +28,17 @@ class ServiceController extends Controller
             ], 200);
         }
     
-    public function show($id)
-    {
-
-        $service = DB::select('select * from services where id = ?', [$id]);
+    public function show($id) {
+        $service = DB::select('select services.id, services.name, services.price, services.description, services.category_id, services.commerce_id, commerces.image  from services
+        INNER JOIN commerces  ON commerces.id = services.commerce_id
+        where services.id = ?;', [$id]);
 
         if (count($service) > 0) {
-
-            $category = DB::select(
-                'select * from categories
-            INNER JOIN services  ON categories.id = services.category_id
-            where services.id = ?;',
-                [$id]
-            );
-
-            $commerce = DB::select('select * from commerces where id = ?', [$service[0]->commerce_id]);
 
             $data = [
                 'code' => 200,
                 'status' => 'success',
-                'services' => $service,
-                'category' => $category,
-                'commerce' => $commerce
-
+                'service' => $service,
             ];
         } else {
             $data = [

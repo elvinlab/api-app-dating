@@ -173,7 +173,6 @@ namespace App\Http\Controllers;
                 // Validar datos
                 $validate = \Validator::make($params_array, [
                     'commerce_id' => 'required',
-                    'service_id' => 'required',
                     'schedule_day' => 'required',
                     'schedule_hour' => 'required',
                 ]);
