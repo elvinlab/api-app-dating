@@ -235,6 +235,24 @@ namespace App\Http\Controllers;
             return response()->json($data, $data['code']);
         }
 
+
+        public function changeStatus(Request $request)
+        {
+            // Recoger los datos por Appointment
+            $json = $request->input('json', null);
+            $params_array = json_decode($json, true, JSON_UNESCAPED_UNICODE);
+
+        DB::update('update appointments set  status = ? where id = ?', [$params_array['status'], $params_array['id']]);
+  
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+        );
+            
+            return response()->json($data, $data['code']);
+        }
+
+
         public function getAppointmentsByClientRecord($id)
         {
      
@@ -312,6 +330,22 @@ namespace App\Http\Controllers;
             ], 200);
         }
 
+        public function getAppointmentsByCommerceValid($expiry, Request $request)
+        {
+            $commerce = $this->getIdentity($request);
+            $appointments = DB::select('SELECT  commerces.name_commerce, clients.name AS nameClient, services.price,  services.name ,clients.phone, appointments.client_id, appointments.id, appointments.commerce_id, appointments.schedule_day, appointments.schedule_hour, appointments.updated_at, appointments.created_at, appointments.status
+            FROM appointments
+            INNER JOIN  commerces ON commerces.id = appointments.commerce_id 
+            INNER JOIN  services ON services.id = appointments.service_id
+            INNER JOIN  clients ON clients.id = appointments.client_id
+            WHERE (commerces.id = ? AND appointments.status = "CONFIRMADA" AND  schedule_day >= ?)', [$commerce->id, $expiry]);
+            return response()->json([
+                'status' => 'success',
+                'appointments' => $appointments,
+          
+            ], 200);
+        }
+
         public function getAppointmentsByCommerceRecord($id)
         {
      
@@ -336,4 +370,5 @@ namespace App\Http\Controllers;
 
             return $client;
         }
+
     }

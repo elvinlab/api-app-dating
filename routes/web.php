@@ -51,8 +51,10 @@ Route::get('/api/getservicecommerce/{id}', 'ServiceController@getServicesByComme
 // Rutas del controlador de Cita
 Route::resource('/api/appointment', 'AppointmentController'); //CRUD
 Route::get('/api/getappointmentscommercerecord/{id}', 'AppointmentController@getAppointmentsByCommerceRecord'); 
+Route::put('/api/changestatus', 'AppointmentController@changeStatus');
 Route::get('/api/getappointmentsclientrecord/{id}', 'AppointmentController@getAppointmentsByClientRecord');
 Route::get('/api/getappointmentsclientconfirmed/{id}', 'AppointmentController@getAppointmentsByClientConfirmed');
-Route::get('/api/getcppointmentsclientcanceled/{id}', 'AppointmentController@getAppointmentsByClientCanceled');
-Route::get('/api/getppointmentsclientpending/{id}', 'AppointmentController@getAppointmentsByClientPending');
-Route::get('/api/getppointmentscommercepending/{id}', 'AppointmentController@getAppointmentsByCommercePending');
+Route::get('/api/getappointmentsclientcanceled/{id}', 'AppointmentController@getAppointmentsByClientCanceled');
+Route::get('/api/getappointmentsclientpending/{id}', 'AppointmentController@getAppointmentsByClientPending');
+Route::get('/api/getappointmentscommercepending/{id}', 'AppointmentController@getAppointmentsByCommercePending');
+Route::get('/api/getappointmentscommercevalid/{date}', 'AppointmentController@getAppointmentsByCommerceValid');
