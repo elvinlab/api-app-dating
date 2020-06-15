@@ -16,10 +16,6 @@ use App\Http\Middleware\ApiAuthMiddleware;
 |
 */
 
-Route::get('/welcome', function () {
-    return view('welcome');
-});
-
 //Rutas del controlador cliente
 Route::post('/api/client/register', 'ClientController@register');
 Route::post('/api/client/login', 'ClientController@login');
