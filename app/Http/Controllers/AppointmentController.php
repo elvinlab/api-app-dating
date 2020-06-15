@@ -239,7 +239,7 @@ namespace App\Http\Controllers;
         {
             // Recoger los datos por Appointment
             $json = $request->input('json', null);
-            $params_array = json_decode($json, true);
+            $params_array = json_decode($json, true, JSON_UNESCAPED_UNICODE);
 
         DB::update('update appointments set  status = ? where id = ?', [$params_array['status'], $params_array['id']]);
   
