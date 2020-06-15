@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class JWTAuthServiceProvider extends ServiceProvider
+class JwtAuthServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
