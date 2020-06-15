@@ -51,7 +51,7 @@ Route::get('/api/getservicecommerce/{id}', 'ServiceController@getServicesByComme
 // Rutas del controlador de Cita
 Route::resource('/api/appointment', 'AppointmentController'); //CRUD
 Route::get('/api/getappointmentscommercerecord/{id}', 'AppointmentController@getAppointmentsByCommerceRecord'); 
-Route::put('/api/changestatus', 'AppointmentController@changeStatus');
+Route::put('/api/changestatus', 'AppointmentController@changeStatus')->middleware(ApiAuthMiddleware::class);
 Route::get('/api/getappointmentsclientrecord/{id}', 'AppointmentController@getAppointmentsByClientRecord');
 Route::get('/api/getappointmentsclientconfirmed/{id}', 'AppointmentController@getAppointmentsByClientConfirmed');
 Route::get('/api/getappointmentsclientcanceled/{id}', 'AppointmentController@getAppointmentsByClientCanceled');
