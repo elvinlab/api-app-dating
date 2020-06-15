@@ -15,20 +15,13 @@ class ApiAuthMiddleware
      */
     public function handle($request, Closure $next)
     {
-
-
-
-
         // Comprobar si el cliente está identificado
         $token = $request->header('Authorization');
         $jwtAuth = new \JwtAuth();
         $checkToken = $jwtAuth->checkToken($token);
 
         if($checkToken){ 
-            return $next($request)
-           ->header(‘Access-Control-Allow-Origin’, ‘*’)
-           ->header(‘Access-Control-Allow-Methods’, ‘GET, POST, PUT, DELETE, OPTIONS’)
-           ->header(‘Access-Control-Allow-Headers’, ‘X-Requested-With, Content-Type, X-Token-Auth, Authorization’);  
+           return $next($request);  
         }else{
    
              $data = array(
