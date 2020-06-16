@@ -104,17 +104,7 @@ namespace App\Http\Controllers;
                     'schedule_hour' => 'required',
                 ]);
 
-            $appointmentValid = DB::select('SELECT *
-            FROM appointments
-            WHERE(appointments.client_id = ?
-            AND appointments.schedule_day = ?
-            AND appointments.schedule_hour = ?)', [
-                $params_array['client_id'],
-                $params_array['schedule_day'],
-                $params_array['schedule_hour'],
-            ]);
-
-                if ($validate->fails() && $appointmentValid > 0) {
+                if ($validate->fails()) {
                     $data = [
                         'code' => 400,
                         'status' => 'error',
@@ -187,17 +177,7 @@ namespace App\Http\Controllers;
                     'schedule_hour' => 'required',
                 ]);
 
-                $appointmentValid = DB::select('SELECT *
-                FROM appointments
-                WHERE(appointments.client_id = ?
-                AND appointments.schedule_day = ?
-                AND appointments.schedule_hour = ?)', [
-                    $params_array['client_id'],
-                    $params_array['schedule_day'],
-                    $params_array['schedule_hour'],
-                ]);
-
-                if ($validate->fails() &&  $appointmentValid > 0) {
+                if ($validate->fails()) {
                     $data['errors'] = $validate->errors();
                     return response()->json($data, $data['code']);
                 }
