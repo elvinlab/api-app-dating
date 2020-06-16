@@ -122,7 +122,7 @@ namespace App\Http\Controllers;
                     $data = [
                         'code' => 400,
                         'status' => 'error',
-                        'message' => 'Ya has creado una cita con la misma fecha y misma hora y con el mismo servicio',
+                        'message' => 'Ya has creado una cita con la misma fecha con misma hora y con el mismo servicio',
                         'error' => $validate->errors()
                     ];
                 } else {
@@ -180,7 +180,7 @@ namespace App\Http\Controllers;
             $data = array(
                 'code' => 400,
                 'status' => 'error',
-                'message' => 'Ya has creado una cita con la misma fecha y misma hora y con el mismo servicio'
+                'message' => 'Ya has creado una cita con la misma fecha, misma hora y con el mismo servicio'
             );
 
             if (!empty($params_array)) {
@@ -191,6 +191,8 @@ namespace App\Http\Controllers;
                     'schedule_hour' => 'required',
                 ]);
 
+                $client = $this->getIdentity($request);
+                
                 $appointmentValid = DB::select('SELECT *
                 FROM appointments
                 
