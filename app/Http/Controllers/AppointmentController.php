@@ -103,12 +103,26 @@ namespace App\Http\Controllers;
                     'schedule_day' => 'required',
                     'schedule_hour' => 'required',
                 ]);
-
-                if ($validate->fails()) {
+                $appointmentValid = DB::select('SELECT *
+                FROM appointments
+                
+                WHERE(appointments.client_id = ?
+                      AND appointments.commerce_id = ?
+                      AND appointments.service_id = ?
+                      AND appointments.schedule_day = ?
+                      AND appointments.schedule_hour = ?)', [
+                        $client->id,
+                        $params_array['commerce_id'],
+                        $params_array['service_id'],
+                        $params_array['schedule_day'],
+                        $params_array['schedule_hour']]);
+                     
+                if ($validate->fails() || $appointmentValid) {
+                    
                     $data = [
                         'code' => 400,
                         'status' => 'error',
-                        'message' => 'Ya has creado una cita con la misma fehcha y misma hora',
+                        'message' => 'Ya has creado una cita con la misma fecha y misma hora',
                         'error' => $validate->errors()
                     ];
                 } else {
@@ -177,7 +191,21 @@ namespace App\Http\Controllers;
                     'schedule_hour' => 'required',
                 ]);
 
-                if ($validate->fails()) {
+                $appointmentValid = DB::select('SELECT *
+                FROM appointments
+                
+                WHERE(appointments.client_id = ?
+                      AND appointments.commerce_id = ?
+                      AND appointments.service_id = ?
+                      AND appointments.schedule_day = ?
+                      AND appointments.schedule_hour = ?)', [
+                        $client->id,
+                        $params_array['commerce_id'],
+                        $params_array['service_id'],
+                        $params_array['schedule_day'],
+                        $params_array['schedule_hour']]);
+
+                if ($validate->fails() || $appointmentValid) {
                     $data['errors'] = $validate->errors();
                     return response()->json($data, $data['code']);
                 }
