@@ -104,11 +104,21 @@ namespace App\Http\Controllers;
                     'schedule_hour' => 'required',
                 ]);
 
-                if ($validate->fails()) {
+            $appointmentValid = DB::select('SELECT *
+            FROM appointments
+            WHERE(appointments.client_id = ?
+            AND appointments.schedule_day = ?
+            AND appointments.schedule_hour = ?)', [
+                $params_array['client_id'],
+                $params_array['schedule_day'],
+                $params_array['schedule_hour'],
+            ]);
+
+                if ($validate->fails() && $appointmentValid > 0) {
                     $data = [
                         'code' => 400,
                         'status' => 'error',
-                        'message' => 'No se ha guardado la cita, faltan datos',
+                        'message' => 'Ya has creado una cita con la misma fehcha y misma hora',
                         'error' => $validate->errors()
                     ];
                 } else {
@@ -166,7 +176,7 @@ namespace App\Http\Controllers;
             $data = array(
                 'code' => 400,
                 'status' => 'error',
-                'message' => 'Datos enviados incorrectamente'
+                'message' => 'Ya has creado una cita con la misma fehcha y misma hora'
             );
 
             if (!empty($params_array)) {
@@ -177,7 +187,17 @@ namespace App\Http\Controllers;
                     'schedule_hour' => 'required',
                 ]);
 
-                if ($validate->fails()) {
+                $appointmentValid = DB::select('SELECT *
+                FROM appointments
+                WHERE(appointments.client_id = ?
+                AND appointments.schedule_day = ?
+                AND appointments.schedule_hour = ?)', [
+                    $params_array['client_id'],
+                    $params_array['schedule_day'],
+                    $params_array['schedule_hour'],
+                ]);
+
+                if ($validate->fails() &&  $appointmentValid > 0) {
                     $data['errors'] = $validate->errors();
                     return response()->json($data, $data['code']);
                 }
