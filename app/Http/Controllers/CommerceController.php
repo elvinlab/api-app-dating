@@ -15,7 +15,7 @@ class CommerceController extends Controller
         return response()->json([
             'code' => 200,
             'status' => 'success',
-            'commerces' => $commerces
+            'Data' => $commerces
         ]);
     }
 
@@ -26,7 +26,7 @@ class CommerceController extends Controller
         return response()->json([
             'code' => 200,
             'status' => 'success',
-            'commerce' => $commerce
+            'Data' => $commerce
         ]);
     }
 
