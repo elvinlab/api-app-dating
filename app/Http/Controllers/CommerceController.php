@@ -10,7 +10,16 @@ class CommerceController extends Controller
 {
     public function getCommerces()
     {
-        $commerces = DB::select('select id, name_owner, name_commerce, cell, tell, address, description, image from commerces');
+        $commerces = DB::select('select 
+        id as Id, 
+        name_owner as NameOwner, 
+        name_commerce as NameCommerce, 
+        cell as Cell, 
+        tell as Tell, 
+        address as Address, 
+        description as Description, 
+        image as Image  
+        from commerces');
 
         return response()->json([
             'code' => 200,
